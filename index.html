@@ -3,477 +3,997 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ahmad Aluminium & Glass - Quotation System</title>
-<style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family: 'Segoe UI', sans-serif; background: #ffffff; color: #333; min-height: 100vh; }
-
-  .app-header { background: #ffffff; padding: 20px 30px; display:flex; align-items:center; gap:15px; border-bottom: 2px solid #cccccc; }
-  .app-header h1 { font-size: 22px; color: #666666; }
-  .app-header span { color: #999999; font-size: 13px; }
-
-  .container { display: grid; grid-template-columns: 410px 1fr; gap: 0; height: calc(100vh - 70px); }
-
-  .form-panel { background: #16213e; padding: 20px; overflow-y: auto; border-right: 1px solid #0f3460; }
-  .form-panel h2 { color: #e74c3c; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid #0f3460; }
-  .form-group { margin-bottom: 12px; }
-  .form-group label { display: block; font-size: 11px; color: #aaa; text-transform: uppercase; margin-bottom: 4px; }
-  .form-group input, .form-group select, .form-group textarea { width: 100%; background: #0f3460; border: 1px solid #1a4a80; color: #eee; padding: 8px 10px; border-radius: 4px; font-size: 13px; }
-  .form-group input:focus, .form-group select:focus { outline: none; border-color: #e74c3c; }
-
-  .items-section { margin-top: 10px; }
-  .item-row { background: #0a1628; border: 1px solid #1a4a80; border-radius: 6px; padding: 12px; margin-bottom: 10px; position: relative; }
-  .item-row h4 { color: #e74c3c; font-size: 12px; margin-bottom: 8px; }
-  .item-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
-  .item-grid .full { grid-column: 1/-1; }
-  .item-grid input, .item-grid select { width:100%; background:#16213e; border:1px solid #1a4a80; color:#eee; padding:6px 8px; border-radius:4px; font-size:12px; }
-  
-  /* Multi-size sub-grid inside the form items */
-  .sizes-container { background: #0f3460; padding: 8px; border-radius: 4px; margin-top: 4px; }
-  .sizes-title { font-size: 10px; color: #ffb4a2; text-transform: uppercase; margin-bottom: 6px; font-weight: bold; }
-  .size-row { display: grid; grid-template-columns: 20px 1fr 15px 1fr 25px 1fr; align-items: center; gap: 4px; margin-bottom: 6px; font-size: 11px; color: #aaa; }
-  .size-row input { text-align: center; padding: 4px 2px !important; }
-
-  .calc-result { background: #0f3460; padding: 6px 8px; border-radius: 4px; font-size: 11px; color: #4ecca3; margin-top: 6px; line-height: 1.4; }
-
-  .btn-add { width:100%; background: #0f3460; border: 1px dashed #e74c3c; color: #e74c3c; padding: 8px; border-radius: 4px; cursor: pointer; font-size: 13px; margin-top: 5px; }
-  .btn-add:hover { background: #e74c3c; color: white; }
-  .btn-glass-room { width:100%; background: linear-gradient(135deg, #16a085, #1abc9c); color:white; border:none; padding: 9px; border-radius: 4px; cursor: pointer; font-size: 13px; margin-top: 8px; font-weight: bold; }
-  .btn-glass-room:hover { background: linear-gradient(135deg, #1abc9c, #16a085); }
-  .btn-remove { position:absolute; top:8px; right:8px; background:#e74c3c; color:white; border:none; border-radius:3px; padding:2px 6px; cursor:pointer; font-size:11px; }
-
-  .btn-generate { width:100%; background: linear-gradient(135deg, #e74c3c, #c0392b); color:white; border:none; padding: 12px; border-radius:6px; cursor:pointer; font-size:15px; font-weight:bold; margin-top:15px; }
-  .btn-generate:hover { background: linear-gradient(135deg, #c0392b, #962d22); }
-
-  .preview-panel { background: #ffffff; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; border-left: 1px solid #ddd; }
-  .preview-toolbar { width: 100%; max-width: 820px; display: flex; gap: 10px; margin-bottom: 15px; }
-  .btn-pdf { background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: bold; }
-  .btn-print { background: #0f3460; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 14px; }
-
-  /* QUOTATION DOC PAGES */
-  .quotation-page { background: white; width: 820px; height: 1120px; padding: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.12); font-family: Arial, sans-serif; color: #222; position: relative; margin-bottom: 25px; box-sizing: border-box; }
-
-  table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 15px; position: relative; z-index: 1; }
-  table th { background: #c0392b; color: white; padding: 10px 8px; text-align: left; }
-  table th:last-child { text-align: right; }
-  table td { padding: 8px 10px; border: 1px solid #ddd; vertical-align: top; }
-  table tr:nth-child(even) td { background: #fdf5f5; }
-  .total-row td { font-weight: bold; background: #fdf5f5 !important; border-top: 2px solid #c0392b; }
-  .total-row td:last-child { color: #c0392b; font-size: 14px; text-align: right; }
-
-  /* Item name bold, description below */
-  .item-name { font-weight: bold; font-size: 12px; color: #111; display: block; margin-bottom: 4px; }
-  .item-desc { font-size: 11.5px; color: #444; line-height: 1.5; display: block; }
-
-  .amount-words { background: #fdf5f5; border: 1px solid #c0392b; padding: 10px 14px; font-size: 12px; margin-bottom: 15px; font-weight: bold; text-align: center; position: relative; z-index: 1; }
-  .doc-section-title { color: #c0392b; font-weight: bold; font-size: 13px; margin: 15px 0 8px; position: relative; z-index: 1; }
-  .doc-list { list-style: none; font-size: 12px; line-height: 2; position: relative; z-index: 1; }
-  .doc-list li::before { content: '✓ '; color: #c0392b; font-weight: bold; }
-  .client-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px; font-size: 13px; position: relative; z-index: 1; }
-  .section-label { font-size: 11px; text-transform: uppercase; color: #999; font-weight: bold; border-bottom: 1px solid #ddd; padding-bottom: 4px; margin-bottom: 6px; }
-  .bank-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; position: relative; z-index: 1; }
-  .bank-card { background: #fdf5f5; border: 1px solid #e0c0c0; padding: 10px; font-size: 11px; line-height: 1.8; border-radius: 4px; }
-  .bank-card strong { color: #c0392b; display: block; margin-bottom: 4px; font-size: 12px; }
-  .bank-iban { font-size: 11px; font-weight: bold; color: #222; }
-
-  /* CSS Watermark Overlay */
-  .watermark-container { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: center; pointer-events: none; z-index: 0; overflow: hidden; }
-  .watermark-text { font-family: Arial, sans-serif; font-size: 50px; font-weight: 900; color: rgba(192, 57, 43, 0.04); text-transform: uppercase; transform: rotate(-35deg); white-space: nowrap; letter-spacing: 5px; }
-
-  @media print {
-    body { background: white; }
-    .app-header, .form-panel, .preview-toolbar, .page-break-divider { display: none !important; }
-    .container { display: block; }
-    .preview-panel { padding: 0; background: white; }
-    .quotation-page { box-shadow: none; width: 100%; height: auto; min-height: 1050px; padding: 0; margin-bottom: 0; page-break-after: always; }
-    .quotation-page:last-of-type { page-break-after: avoid; }
-  }
-  .page-break-divider { text-align:center; color:#888; font-size:11px; font-weight: bold; padding: 10px 0; letter-spacing:2px; text-transform: uppercase; }
-</style>
-</head>
-<body>
-
-<div class="app-header">
-  <div>
-    <h1>🏢 Ahmad Aluminium & Glass Cont</h1>
-    <span>#1 Aluminium & Glass Cont UAE — Quotation Generator</span>
-  </div>
-</div>
-
-<div class="container">
-  <!-- FORM PANEL -->
-  <div class="form-panel">
-    
-    <!-- CLOUD SYNC CONTROLS -->
-    <div class="form-group" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 6px; border: 1px solid #1a4a80; margin-bottom: 20px;">
-      <label style="color: #4ecca3; font-weight: bold; font-size: 11px; margin-bottom: 8px; display: block; letter-spacing: 1px;">☁️ Cloud Database</label>
-      <input type="text" id="dbUrl" placeholder="Paste your Google Web App URL here" style="margin-bottom: 8px; font-size: 11px;">
-      <div style="display: flex; gap: 8px;">
-        <button onclick="saveToCloud()" style="flex: 1; background: #2ecc71; color: white; border: none; padding: 8px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: bold;">💾 Save / Update</button>
-        <button onclick="loadFromCloud()" style="flex: 1; background: #3498db; color: white; border: none; padding: 8px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: bold;">📂 Load Quote</button>
-      </div>
-    </div>
-
-    <h2>📋 Quotation Details</h2>
-
-    <div class="form-group">
-      <label>Quotation Number</label>
-      <input type="text" id="quotRef" placeholder="AA-2026-203">
-    </div>
-    <div class="form-group">
-      <label>Date</label>
-      <input type="date" id="quotDate">
-    </div>
-    <div class="form-group">
-      <label>Client Address</label>
-      <input type="text" id="clientAddr" placeholder="Al Sufouh, Dubai - UAE">
-    </div>
-    <div class="form-group">
-      <label>Client Phone</label>
-      <input type="text" id="clientPhone" placeholder="NA">
-    </div>
-    <div class="form-group">
-      <label>Client Email</label>
-      <input type="text" id="clientEmail" placeholder="NA">
-    </div>
-    <div class="form-group">
-      <label>Subject / Work Type</label>
-      <input type="text" id="subject" placeholder="Supply & Installation of Glass Room Work">
-    </div>
-
-    <h2 style="margin-top:20px;">🔧 Line Items</h2>
-    <button class="btn-glass-room" onclick="loadGlassRoomItems()">🏠 Load All Glass Room Items</button>
-    <div class="items-section" id="itemsContainer"></div>
-    <button class="btn-add" onclick="addItem()">+ Add Custom Item</button>
-
-    <button class="btn-generate" onclick="generateQuotation()">⚡ Generate Quotation</button>
-  </div>
-
-  <!-- PREVIEW PANEL -->
-  <div class="preview-panel">
-    <div class="preview-toolbar">
-      <button class="btn-pdf" onclick="downloadPDF()">📄 Download / Print PDF</button>
-      <button class="btn-print" onclick="window.print()">🖨️ Print</button>
-    </div>
-    <div class="quotation-container" id="quotationDoc">
-      <div style="text-align:center; color:#999; padding:80px 0; font-size:16px;">
-        Fill the form and click <strong style="color:#e74c3c">Generate Quotation</strong>
-      </div>
-    </div>
-  </div>
-</div>
+<title>Ahmad Aluminium & Glass Contractor — Digital Proposal System</title>
+<!-- Google Fonts for elite architectural corporate feeling -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Tailwind CSS via CDN for rapid styling and elite responsive interface layout -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- html2pdf.js CDN library for high-fidelity programmatic PDF exports -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <script>
-
-// ─── ITEM LIBRARY ───────────────────────────────────────────────────────────
-const ITEM_LIBRARY = {
-  'Structure': 'Supply & installation of Juton powder coated 100mm × 100mm, 2mm thick aluminium tube frame for roof and pillars.',
-  'Swing Door': 'Supply & installation of Juton powder coated 4.5cm aluminium frame swing door with double glass (6mm tempered clear + 12mm air spacer + 6mm tempered clear glass).',
-  '3 Side Closing with Cement Board & Gypsum': 'Supply & installation of outside cement board, inside gypsum board with GI channel, wall construction and white paint finishing.',
-  'Sandwich Panel Roof': 'Supply & installation of 9cm thick sandwich panel roof with sheets on both sides and insulation foam inside, 10cm slope for drainage, 100% waterproofing.',
-  'Gypsum Ceiling': 'Supply & installation of GI channel frame for gypsum board ceiling with white paint finishing.',
-  'Electric': 'Supply & installation of spot lights in gypsum board ceiling and power sockets as required.',
-  'AC': 'Supply & installation of 1.5 Ton Samsung or Super General AC with up to 3m copper pipe connection and power supply installation.',
-};
-
-const GLASS_ROOM_ITEMS = [
-  'Structure',
-  'Swing Door',
-  '3 Side Closing with Cement Board & Gypsum',
-  'Sandwich Panel Roof',
-  'Gypsum Ceiling',
-  'Electric',
-  'AC',
-];
-
-document.getElementById('quotDate').valueAsDate = new Date();
-
-// Load or initialize Quotation Auto-number
-let nextQuotNum = localStorage.getItem('nextQuotNum');
-if (!nextQuotNum) {
-  nextQuotNum = 203;
-  localStorage.setItem('nextQuotNum', nextQuotNum);
-}
-document.getElementById('quotRef').value = "AA-2026-" + nextQuotNum;
-
-// Persistent Database URL loader
-const savedUrl = localStorage.getItem('dbUrl');
-if (savedUrl) {
-  document.getElementById('dbUrl').value = savedUrl;
-}
-document.getElementById('dbUrl').addEventListener('input', (e) => {
-  localStorage.setItem('dbUrl', e.target.value.trim());
-});
-
-let itemCount = 0;
-
-// ─── LOAD GLASS ROOM PRESET ─────────────────────────────────────────────────
-function loadGlassRoomItems() {
-  if (document.querySelectorAll('.item-row').length > 0) {
-    if (!confirm('This will replace existing items with Glass Room items. Continue?')) return;
-    document.getElementById('itemsContainer').innerHTML = '';
-    itemCount = 0;
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter', 'sans-serif'],
+          display: ['Outfit', 'sans-serif'],
+          mono: ['JetBrains Mono', 'monospace'],
+        },
+        colors: {
+          brand: {
+            50: '#fff5f5',
+            100: '#fed7d7',
+            200: '#feb2b2',
+            600: '#e53e3e',
+            700: '#c0392b', // Ahmad Aluminium primary maroon hue
+            800: '#9b2c2c',
+          },
+          corporate: {
+            900: '#0f172a',
+            950: '#020617',
+          }
+        }
+      }
+    }
   }
-  GLASS_ROOM_ITEMS.forEach(name => addItem(name, ITEM_LIBRARY[name]));
-  document.getElementById('subject').value = 'Supply & Installation of Glass Room Work';
-}
+</script>
 
-// ─── ADD ITEM ────────────────────────────────────────────────────────────────
-function addItem(prefillName = '', prefillDesc = '') {
-  itemCount++;
-  const id = itemCount;
-  const div = document.createElement('div');
-  div.className = 'item-row';
-  div.id = 'item_' + id;
+<style>
+  /* Print simulation style layers for A4 fidelity rendering on screen and paper */
+  .quotation-page {
+    background: white;
+    width: 210mm;
+    min-height: 297mm;
+    height: auto;
+    padding: 20mm;
+    box-shadow: 0 10px 40px rgba(15, 23, 42, 0.08);
+    font-family: 'Segoe UI', 'Inter', Arial, sans-serif;
+    color: #1e293b;
+    position: relative;
+    box-sizing: border-box;
+  }
 
-  const options = ['-- Select Item --', ...Object.keys(ITEM_LIBRARY), 'Custom'];
-  const optionsHTML = options.map(o => `<option value="${o}"${o === prefillName ? ' selected' : ''}>${o}</option>`).join('');
+  .quotation-page-footer {
+    background: white;
+    width: 210mm;
+    min-height: 297mm;
+    height: auto;
+    padding: 20mm;
+    box-shadow: 0 10px 40px rgba(15, 23, 42, 0.08);
+    font-family: 'Segoe UI', 'Inter', Arial, sans-serif;
+    color: #1e293b;
+    position: relative;
+    box-sizing: border-box;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
 
-  div.innerHTML = `
-    <h4>Item #${id}</h4>
-    <button class="btn-remove" onclick="removeItem(${id})">✕</button>
-    <div class="item-grid">
-      <div class="full">
-        <label>Quick Select (auto-fills name & description)</label>
-        <select onchange="onNameSelect(${id}, this.value)">
-          ${optionsHTML}
-        </select>
-      </div>
-      <div class="full">
-        <label>Item Name (editable)</label>
-        <input type="text" id="name_${id}" value="${prefillName}" placeholder="e.g. Structure, Swing Door..." style="font-weight:bold;">
-      </div>
-      <div class="full">
-        <label>Description</label>
-        <textarea id="desc_${id}" rows="2" style="width:100%;background:#16213e;border:1px solid #1a4a80;color:#eee;padding:6px 8px;border-radius:4px;font-size:11px;resize:vertical;" placeholder="Supply & Installation of...">${prefillDesc}</textarea>
-      </div>
-      
-      <div class="full sizes-container">
-        <div class="sizes-title">📐 Sizes (Multiple Dimension sets)</div>
-        <div class="size-row">
-          <span>#1</span>
-          <input type="number" id="w1_${id}" placeholder="W (cm)" oninput="calcArea(${id})">
-          <span>×</span>
-          <input type="number" id="h1_${id}" placeholder="H (cm)" oninput="calcArea(${id})">
-          <span>Qty</span>
-          <input type="number" id="qty1_${id}" value="1" oninput="calcArea(${id})">
-        </div>
-        <div class="size-row">
-          <span>#2</span>
-          <input type="number" id="w2_${id}" placeholder="W (cm)" oninput="calcArea(${id})">
-          <span>×</span>
-          <input type="number" id="h2_${id}" placeholder="H (cm)" oninput="calcArea(${id})">
-          <span>Qty</span>
-          <input type="number" id="qty2_${id}" oninput="calcArea(${id})">
-        </div>
-        <div class="size-row">
-          <span>#3</span>
-          <input type="number" id="w3_${id}" placeholder="W (cm)" oninput="calcArea(${id})">
-          <span>×</span>
-          <input type="number" id="h3_${id}" placeholder="H (cm)" oninput="calcArea(${id})">
-          <span>Qty</span>
-          <input type="number" id="qty3_${id}" oninput="calcArea(${id})">
-        </div>
-      </div>
+  /* Prevent sub-components from splitting in PDF compiles */
+  .page-break-inside-avoid {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
 
-      <div class="full" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-        <div>
-          <label>Price per m²</label>
-          <input type="number" id="price_${id}" placeholder="e.g. 1500" oninput="calcArea(${id})">
-        </div>
-        <div>
-          <label>OR Fixed Price (AED)</label>
-          <input type="number" id="fixed_${id}" placeholder="e.g. 15000" oninput="calcArea(${id})">
-        </div>
+  @media print {
+    @page { 
+      size: A4; 
+      margin: 0 !important; 
+    }
+    body { 
+      background: white !important; 
+      margin: 0 !important; 
+      padding: 0 !important; 
+    }
+    .no-print { 
+      display: none !important; 
+    }
+    .preview-panel { 
+      padding: 0 !important; 
+      margin: 0 !important; 
+      background: white !important; 
+      width: 100% !important; 
+    }
+    .quotation-page { 
+      box-shadow: none !important; 
+      border: none !important; 
+      width: 210mm !important; 
+      height: auto !important; 
+      min-height: 297mm !important; 
+      padding: 20mm !important; 
+      margin: 0 !important; 
+      page-break-after: always !important; 
+      page-break-inside: auto !important; 
+    }
+    .quotation-page-footer { 
+      box-shadow: none !important; 
+      border: none !important; 
+      width: 210mm !important; 
+      height: auto !important; 
+      min-height: 297mm !important; 
+      padding: 20mm !important; 
+      margin: 0 !important; 
+      page-break-inside: avoid !important; 
+      break-inside: avoid !important; 
+      page-break-after: avoid !important; 
+    }
+  }
+
+  /* Custom minimal scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0f172a;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+  }
+</style>
+</head>
+<body class="bg-corporate-950 font-sans text-slate-100 min-h-screen antialiased flex flex-col">
+
+<!-- Top Corporate Navigation Header -->
+<div class="bg-corporate-900 border-b border-slate-800 px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sticky top-0 z-50 shadow-xl no-print">
+  <div class="flex items-center gap-3">
+    <div class="bg-brand-700/10 border border-brand-600/20 p-2.5 rounded-xl text-brand-600 shadow-md">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+      </svg>
+    </div>
+    <div>
+      <h1 class="text-base font-bold font-display text-white tracking-wide leading-tight">🏢 Ahmad Aluminium & Glass Cont</h1>
+      <p class="text-[11px] text-slate-400 font-medium">Dubai, UAE &middot; Official Quotation &amp; Project Engineering Studio</p>
+    </div>
+  </div>
+  
+  <div class="flex items-center gap-2">
+    <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-950 border border-slate-800 text-[10.5px] font-mono text-slate-300">
+      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      <span>Database Sync:</span>
+      <span id="syncStatusText" class="text-emerald-400 font-bold">CONNECTED</span>
+    </div>
+  </div>
+</div>
+
+<!-- Main Body Application Workspace -->
+<div class="grow grid grid-cols-1 xl:grid-cols-[410px_1fr] overflow-hidden">
+  
+  <!-- LEFT SIDEBAR FORM AREA (Form Controls and Inputs) -->
+  <div class="bg-corporate-900 border-r border-slate-800 p-5 overflow-y-auto space-y-5 no-print select-none">
+    
+    <!-- 1) Automatic Sync Settings and directory saving handles -->
+    <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3 shadow-inner">
+      <div class="flex items-center gap-1.5 text-brand-200 text-xs font-bold uppercase tracking-widest border-b border-slate-800 pb-2">
+        <svg class="w-3.5 h-3.5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20"></path>
+        </svg>
+        <span>Automatic Download Directory</span>
+      </div>
+      <button onclick="selectAutoSaveFolder()" class="w-full bg-brand-700 hover:bg-brand-600 active:bg-brand-800 text-white py-2 px-3 rounded-lg text-xs font-bold transition duration-150 cursor-pointer shadow">
+        📂 Choose Local Save Folder
+      </button>
+      <div id="folderStatus" class="text-[10px] text-slate-400">
+        Status: Saving inside browser's default Downloads directory
       </div>
     </div>
-    <div class="calc-result" id="calc_${id}" data-amount="0">Enter dimensions or fixed price</div>
-  `;
-  document.getElementById('itemsContainer').appendChild(div);
-}
 
-function onNameSelect(id, value) {
-  if (value && ITEM_LIBRARY[value]) {
-    document.getElementById('name_' + id).value = value;
-    document.getElementById('desc_' + id).value = ITEM_LIBRARY[value];
-  } else if (value === 'Custom') {
-    document.getElementById('name_' + id).value = '';
-    document.getElementById('desc_' + id).value = '';
-    document.getElementById('name_' + id).focus();
-  }
-}
+    <!-- 2) Database History Logs Directory search -->
+    <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3 shadow-inner">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+        <span class="text-brand-200 text-xs font-bold uppercase tracking-widest">Search Recent Quotations</span>
+        <button onclick="fetchRecentQuotes()" class="p-1 px-2 text-[10px] font-semibold bg-slate-900 border border-slate-800 hover:text-brand-200 hover:bg-slate-850 duration-150 rounded cursor-pointer flex items-center gap-1">
+          🔄 Reload
+        </button>
+      </div>
+      <input type="text" id="searchQuotes" oninput="filterRecentQuotes()" placeholder="Search client address, references..." class="w-full px-3 py-1.5 bg-slate-900 border border-slate-800 text-slate-200 placeholder-slate-500 rounded-lg text-xs focus:outline-none focus:border-brand-700 transition">
+      
+      <div id="recentQuotesList" class="max-h-[120px] overflow-y-auto bg-slate-900/40 rounded-lg text-xs border border-slate-850">
+        <div class="text-center text-slate-500 py-6">Connecting Google Database...</div>
+      </div>
+    </div>
 
-function calcArea(id) {
-  let totalRawArea = 0;
-  let totalQty = 0;
-  let sizeStrings = [];
+    <!-- 3) Primary Quotation Info Properties panel -->
+    <div class="space-y-4">
+      <div class="border-b border-slate-800 pb-2">
+        <h2 class="text-slate-300 text-xs font-bold uppercase tracking-widest flex items-center gap-1.5 text-brand-600">
+          Proposal Metadata Properties
+        </h2>
+      </div>
 
-  for (let s = 1; s <= 3; s++) {
-    const w = parseFloat(document.getElementById(`w${s}_${id}`).value) || 0;
-    const h = parseFloat(document.getElementById(`h${s}_${id}`).value) || 0;
-    const qty = parseFloat(document.getElementById(`qty${s}_${id}`).value) || (s === 1 ? 1 : 0);
+      <div class="space-y-1.5">
+        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">👷 Select Works Category Option</label>
+        <select id="workTypeSelector" onchange="onWorkTypeChange(this.value)" class="w-full bg-slate-950 border border-slate-800 text-slate-200 px-3 py-2 rounded-lg text-xs focus:outline-none focus:border-brand-700 cursor-pointer">
+          <option value="Custom">Custom / Manual Input</option>
+        </select>
+      </div>
 
-    if (w > 0 && h > 0 && qty > 0) {
-      const rawArea = (w / 100) * (h / 100) * qty;
-      totalRawArea += rawArea;
-      totalQty += qty;
-      sizeStrings.push(`${w}×${h}cm (${qty})`);
-    }
-  }
+      <div class="grid grid-cols-2 gap-3.5">
+        <div class="space-y-1">
+          <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Reference Code</label>
+          <input type="text" id="quotRef" placeholder="AA-2026-215" class="w-full bg-slate-950 border border-slate-800 text-slate-200 px-3 py-1.5 rounded-lg text-xs focus:outline-none focus:border-brand-700 font-mono">
+        </div>
+        <div class="space-y-1">
+          <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Proposal Date</label>
+          <input type="date" id="quotDate" class="w-full bg-slate-950 border border-slate-800 text-slate-200 px-2 py-1.5 rounded-lg text-xs focus:outline-none focus:border-brand-700">
+        </div>
+      </div>
 
-  const pricePerM2 = parseFloat(document.getElementById('price_' + id).value) || 0;
-  const fixedPrice = parseFloat(document.getElementById('fixed_' + id).value) || 0;
+      <div class="space-y-1">
+        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Client Destination Address</label>
+        <input type="text" id="clientAddr" placeholder="Al Sufouh, Dubai" class="w-full bg-slate-950 border border-slate-800 text-slate-200 px-3 py-1.5 rounded-lg text-xs focus:outline-none focus:border-brand-700">
+      </div>
 
-  let amount = 0;
-  let calcText = '';
+      <div class="grid grid-cols-2 gap-3.5">
+        <div class="space-y-1">
+          <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Client Phone Contact</label>
+          <input type="text" id="clientPhone" placeholder="+971 58 849 0784" class="w-full bg-slate-950 border border-slate-800 text-slate-200 px-3 py-1.5 rounded-lg text-xs focus:outline-none focus:border-brand-700">
+        </div>
+        <div class="space-y-1">
+          <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Client Email ID</label>
+          <input type="text" id="clientEmail" placeholder="client@domain.com" class="w-full bg-slate-950 border border-slate-800 text-slate-200 px-3 py-1.5 rounded-lg text-xs focus:outline-none focus:border-brand-700">
+        </div>
+      </div>
 
-  if (fixedPrice > 0) {
-    const activeQty = totalQty > 0 ? totalQty : 1;
-    amount = fixedPrice * activeQty;
-    calcText = `Fixed Price: AED ${fixedPrice.toFixed(2)} × Qty ${activeQty} = AED ${amount.toFixed(2)}`;
-  } else if (totalRawArea > 0 && pricePerM2 > 0) {
-    const roundedArea = Math.ceil(totalRawArea * 2) / 2;
-    amount = roundedArea * pricePerM2;
-    calcText = `Total Area: ${totalRawArea.toFixed(4)}m² → Rounded: ${roundedArea.toFixed(1)}m² × AED ${pricePerM2}/m² = AED ${amount.toFixed(2)}`;
-  } else if (totalRawArea > 0) {
-    calcText = `Total Area: ${totalRawArea.toFixed(4)}m² | Enter price to calculate`;
-  } else {
-    calcText = 'Enter dimensions or fixed price';
-  }
+      <div class="space-y-1">
+        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Quotation Subject Header</label>
+        <input type="text" id="subject" placeholder="Glass Room Work" class="w-full bg-slate-950 border border-slate-800 text-slate-200 px-3 py-1.5 rounded-lg text-xs focus:outline-none focus:border-brand-700">
+      </div>
 
-  const el = document.getElementById('calc_' + id);
-  el.textContent = calcText;
-  el.dataset.amount = amount;
-  el.dataset.sizeText = sizeStrings.join(' | ');
-  el.dataset.roundedArea = totalRawArea > 0 ? (Math.ceil(totalRawArea * 2) / 2).toFixed(1) : '';
-}
+      <div class="space-y-1">
+        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">VAT Settings</label>
+        <select id="vatToggle" onchange="generateQuotation();" class="w-full bg-slate-950 border border-slate-800 text-slate-200 px-3 py-2 rounded-lg text-xs focus:outline-none focus:border-brand-700 cursor-pointer font-semibold">
+          <option value="no">Exempted / No VAT</option>
+          <option value="yes">Include 5% UAE VAT</option>
+        </select>
+      </div>
 
-function removeItem(id) {
-  document.getElementById('item_' + id).remove();
-}
+      <!-- 4) Room dimension configurations -->
+      <div class="p-4 rounded-xl border border-teal-500/10 bg-teal-950/10 space-y-3 shadow-inner">
+        <div class="text-teal-400 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5">
+          <span>📐 Project Master Dimensions (cm)</span>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <div class="space-y-1">
+            <span class="text-[8px] text-slate-450 block text-center font-bold">WIDTH (W)</span>
+            <input type="number" id="globalWidth" placeholder="W" class="w-full bg-slate-950 border border-slate-800 rounded py-1 text-center text-xs focus:outline-none text-slate-100">
+          </div>
+          <div class="space-y-1">
+            <span class="text-[8px] text-slate-450 block text-center font-bold">LENGTH (L)</span>
+            <input type="number" id="globalLength" placeholder="L" class="w-full bg-slate-950 border border-slate-800 rounded py-1 text-center text-xs focus:outline-none text-slate-100">
+          </div>
+          <div class="space-y-1">
+            <span class="text-[8px] text-slate-450 block text-center font-bold">HEIGHT (H)</span>
+            <input type="number" id="globalHeight" placeholder="H" class="w-full bg-slate-950 border border-slate-800 rounded py-1 text-center text-xs focus:outline-none text-slate-100">
+          </div>
+        </div>
+        <button onclick="applySmartEstimator()" class="w-full bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs py-1.5 px-3 rounded-lg shadow-md transition duration-150 cursor-pointer">
+          ⚡ Apply Smart Estimator Formulas
+        </button>
+      </div>
 
-function getItems() {
-  const items = [];
-  document.querySelectorAll('.item-row').forEach(row => {
-    const id = row.id.replace('item_', '');
-    const nameEl = document.getElementById('name_' + id);
-    const selectedName = nameEl ? nameEl.value : '';
-    let itemName = (selectedName && selectedName !== '-- Select Item --' && selectedName !== 'Custom') ? selectedName : '';
-    const calcEl = document.getElementById('calc_' + id);
-    const amount = parseFloat(calcEl.dataset.amount) || 0;
-    const size = calcEl.dataset.sizeText || '-';
-    const roundedArea = calcEl.dataset.roundedArea || '';
-    const desc = document.getElementById('desc_' + id).value;
-    items.push({ itemName, desc, size, qty: 1, amount, roundedArea });
+      <!-- 5) Dynamic Item List -->
+      <div class="border-b border-slate-800 pb-2 pt-2">
+        <h2 class="text-slate-300 text-xs font-bold uppercase tracking-widest text-brand-600">
+          Quotation Line Items
+        </h2>
+      </div>
+
+      <div class="items-section space-y-4" id="itemsContainer"></div>
+      
+      <div class="flex flex-col gap-2 pt-1 font-bold">
+        <button onclick="addItem()" class="w-full bg-slate-950 hover:bg-slate-900 border border-dashed border-slate-750 text-slate-300 hover:text-white py-2 px-3 rounded-lg text-xs font-bold transition duration-150 cursor-pointer">
+          + Add Custom Blank Material Row
+        </button>
+        <button onclick="clearDraft()" class="w-full bg-red-600/10 border border-red-900/30 hover:bg-red-500/25 text-red-400 py-1.5 px-3 rounded-lg text-xs transition duration-150 cursor-pointer">
+          🧹 Clear Draft & Re-initialize
+        </button>
+      </div>
+
+      <button onclick="generateQuotation(); triggerSilentCloudSave();" class="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white py-3 px-4 rounded-xl font-bold tracking-wider text-xs shadow-lg transition duration-200 cursor-pointer uppercase">
+        ⚡ Compile & Refresh Document
+      </button>
+
+    </div>
+  </div>
+
+  <!-- RIGHT PREVIEW CANVAS PANEL (Visual A4 Letterhead Frame) -->
+  <div class="bg-corporate-950 overflow-y-auto flex flex-col items-center p-6 space-y-6">
+    
+    <!-- PDF and WhatsApp Quick Sync Header actions -->
+    <div class="w-full max-w-[210mm] flex flex-col sm:flex-row items-center justify-between bg-corporate-900 border border-slate-800 p-4 rounded-xl shadow-md gap-4 no-print select-none">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-brand-700 animate-pulse"></span>
+        <span class="text-xs font-semibold text-slate-300 uppercase tracking-widest font-display">Client View (Revamped High-End Page)</span>
+      </div>
+      <div class="flex items-center gap-3 w-full sm:w-auto">
+        <button onclick="downloadPDF()" class="flex-1 sm:flex-none flex items-center justify-center gap-1.5 bg-brand-700 hover:bg-brand-600 active:scale-[0.98] text-white font-bold text-xs py-2 px-4 rounded-lg shadow transition cursor-pointer">
+          📄 Download PDF Client Draft
+        </button>
+        <button onclick="shareToWhatsApp()" class="flex-1 sm:flex-none flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 active:scale-[0.98] text-white font-bold text-xs py-2 px-4 rounded-lg shadow transition cursor-pointer">
+          💬 Send on WhatsApp
+        </button>
+        <button onclick="window.print()" class="p-2 bg-slate-800 hover:bg-slate-700 hover:text-white text-slate-400 rounded-lg shadow duration-150 cursor-pointer">
+          🖨️ Local Print
+        </button>
+      </div>
+    </div>
+
+    <!-- Active dynamic frame layout wrapper -->
+    <div class="quotation-container" id="quotationDoc">
+      <div class="w-[210mm] h-[297mm] bg-white rounded-lg flex items-center justify-center text-slate-400 font-medium font-display shadow-2xl">
+        Fill and customize metadata, then click "Compile Document" to generate high-fidelity layers.
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Data List references -->
+<datalist id="itemNamesDatalist"></datalist>
+
+<!-- JavaScript Core Program Logic Engine -->
+<script>
+const DB_URL = "https://script.google.com/macros/s/AKfycbz7vTFZevifbAMfMHH7XxG7cI3Zgv_uCnLgK1DKfdhCQ3LF__JC4HIH8wvTH5BKhL59Uw/exec";
+const SPREADSHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTNizzL9Im6qMmjEcuOhH5404-GMIJDXqSuGw3xrZQARxk1sJhTIkVqT8C2AwvchDHbysmB-oftQ3Sk/pub?output=csv";
+
+let currentYear = new Date().getFullYear();
+let parsedLibrary = {};
+let flatItemLibrary = {};
+let hasEstimatorBeenRun = false;
+let itemCount = 0;
+let cachedRecentQuotes = [];
+let savedFolderHandle = null;
+
+// --- INDEXEDDB AUTO-SAVE STORAGE ENGINE ---
+const IDB_DB_NAME = 'AhmadAluDirectoryDB';
+const IDB_STORE_NAME = 'handles';
+const IDB_KEY_NAME = 'savedFolder';
+
+function getIDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(IDB_DB_NAME, 1);
+    request.onupgradeneeded = (e) => {
+      e.target.result.createObjectStore(IDB_STORE_NAME);
+    };
+    request.onsuccess = (e) => resolve(e.target.result);
+    request.onerror = (e) => reject(e.target.error);
   });
-  return items;
 }
 
-// ─── CLOUD DATA SERIALIZER ──────────────────────────────────────────────────
-function serializeItems() {
-  const items = [];
-  document.querySelectorAll('.item-row').forEach(row => {
-    const id = row.id.replace('item_', '');
-    const name = document.getElementById('name_' + id).value;
-    const desc = document.getElementById('desc_' + id).value;
-    const price = document.getElementById('price_' + id).value;
-    const fixed = document.getElementById('fixed_' + id).value;
-    const sizes = [];
-    for (let s = 1; s <= 3; s++) {
-      sizes.push({
-        w: document.getElementById(`w${s}_${id}`).value,
-        h: document.getElementById(`h${s}_${id}`).value,
-        qty: document.getElementById(`qty${s}_${id}`).value
+function saveDirectoryHandle(handle) {
+  return getIDB().then(db => {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(IDB_STORE_NAME, 'readwrite');
+      const store = tx.objectStore(IDB_STORE_NAME);
+      const req = store.put(handle, IDB_KEY_NAME);
+      req.onsuccess = () => resolve();
+      req.onerror = () => reject(req.error);
+    });
+  });
+}
+
+function loadDirectoryHandle() {
+  return getIDB().then(db => {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(IDB_STORE_NAME, 'readonly');
+      const store = tx.objectStore(IDB_STORE_NAME);
+      const req = store.get(IDB_KEY_NAME);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }).catch(() => null);
+}
+
+function verifyPermission(fileHandle, readWrite) {
+  const options = {};
+  if (readWrite) {
+    options.mode = 'readwrite';
+  }
+  return fileHandle.queryPermission(options).then(permission => {
+    if (permission === 'granted') return true;
+    return fileHandle.requestPermission(options).then(request => request === 'granted');
+  });
+}
+
+// Automatically choose directory handler triggers
+function selectAutoSaveFolder() {
+  if (!window.showDirectoryPicker) {
+    alert("This browser environment does not support folder-level Access API directory saving. Standard downloads will compile inside your browser's default Downloads folder.");
+    return;
+  }
+  window.showDirectoryPicker({ mode: 'readwrite' })
+    .then(handle => {
+      saveDirectoryHandle(handle).then(() => {
+        savedFolderHandle = handle;
+        updateFolderStatusUI(handle.name);
+        alert(`Success! Automatic directory save registered to: "${handle.name}".`);
       });
+    })
+    .catch(err => {
+      console.warn("Folder choice cancelled", err);
+    });
+}
+
+function updateFolderStatusUI(folderName) {
+  const statusEl = document.getElementById('folderStatus');
+  if (statusEl) {
+    statusEl.innerHTML = folderName 
+      ? `Status: Saving inside <strong class="text-brand-200">${folderName}</strong>`
+      : 'Status: Saving inside browser\'s default Downloads directory';
+  }
+}
+
+function initFolderSelection() {
+  loadDirectoryHandle().then(handle => {
+    if (handle) {
+      savedFolderHandle = handle;
+      updateFolderStatusUI(handle.name);
     }
-    items.push({ name, desc, price, fixed, sizes });
   });
-  return items;
+}
+
+// --- CLOUD DATABASE HISTORY LOGS PARSERS ---
+function fetchRecentQuotes() {
+  const listEl = document.getElementById('recentQuotesList');
+  listEl.innerHTML = '<div class="text-center text-slate-500 py-6">Connecting Google Database...</div>';
+  
+  fetch(DB_URL)
+    .then(res => {
+      if (!res.ok) throw new Error("HTTP database error " + res.status);
+      return res.json();
+    })
+    .then(quotes => {
+      cachedRecentQuotes = quotes;
+      renderRecentQuotes(quotes);
+    })
+    .catch(err => {
+      console.error(err);
+      listEl.innerHTML = `
+        <div class="text-center text-red-400 py-6 px-3">
+          ⚠️ Connection Failure<br>
+          <span class="text-[9px] text-slate-500 block mt-1">Please ensure database is deployed correctly.</span>
+        </div>`;
+    });
+}
+
+function renderRecentQuotes(quotes) {
+  const listEl = document.getElementById('recentQuotesList');
+  if (!quotes || quotes.length === 0) {
+    listEl.innerHTML = '<div class="text-center text-slate-500 py-6">No historical entries.</div>';
+    return;
+  }
+  listEl.innerHTML = '';
+  quotes.forEach(q => {
+    const btn = document.createElement('button');
+    btn.className = "w-full text-left p-2.5 px-3 border-b border-slate-800 hover:bg-slate-800/50 flex justify-between items-center transition cursor-pointer gap-2";
+    
+    let total = 0;
+    if (q.itemsJson) {
+      try {
+        const items = JSON.parse(q.itemsJson);
+        total = items.reduce((s, i) => s + (parseFloat(i.amount) || 0), 0);
+      } catch(e) {}
+    }
+    
+    const displayTotal = total.toLocaleString('en', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    btn.innerHTML = `
+      <div class="truncate grow">
+        <strong class="text-slate-200 block truncate text-[11px] font-mono font-bold">${q.ref || 'AA-UNKNOWN'}</strong>
+        <span class="text-slate-500 block truncate text-[10px] mt-0.5">${q.clientAddr || 'No Address'}</span>
+      </div>
+      <span class="shrink-0 text-emerald-400 font-bold bg-emerald-500/10 text-[10.5px] rounded px-1.5 py-0.5">${displayTotal} AED</span>
+    `;
+    btn.onclick = () => loadQuoteFromDirectory(q);
+    listEl.appendChild(btn);
+  });
+}
+
+function filterRecentQuotes() {
+  const term = document.getElementById('searchQuotes').value.toLowerCase();
+  const filtered = cachedRecentQuotes.filter(q => 
+    (q.ref && q.ref.toLowerCase().includes(term)) || 
+    (q.clientAddr && q.clientAddr.toLowerCase().includes(term))
+  );
+  renderRecentQuotes(filtered);
+}
+
+function loadQuoteFromDirectory(q) {
+  document.getElementById('quotRef').value = q.ref || '';
+  document.getElementById('clientAddr').value = q.clientAddr || '';
+  document.getElementById('clientPhone').value = q.clientPhone || '';
+  document.getElementById('clientEmail').value = q.clientEmail || '';
+  document.getElementById('subject').value = q.subject || '';
+  
+  if (q.date) {
+    try {
+      const d = new Date(q.date);
+      if (!isNaN(d.getTime())) {
+        document.getElementById('quotDate').valueAsDate = d;
+      }
+    } catch(e) {}
+  }
+
+  if (q.itemsJson) {
+    try {
+      const itemsData = JSON.parse(q.itemsJson);
+      deserializeItems(itemsData);
+    } catch(e) {
+      console.error("Could not parse itemsJson", e);
+    }
+  }
+  generateQuotation();
+  alert(`Successfully loaded quotation: Ref "${q.ref}" for "${q.clientAddr || 'NA'}"`);
 }
 
 function deserializeItems(itemsData) {
   document.getElementById('itemsContainer').innerHTML = '';
   itemCount = 0;
   itemsData.forEach(item => {
-    addItem(item.name, item.desc);
+    const isFixed = item.priceType === 'Fixed';
+    addItem(item.itemName || item.name || '', item.desc || '', item.rate || item.price || '', isFixed);
     const id = itemCount;
-    document.getElementById('price_' + id).value = item.price || '';
-    document.getElementById('fixed_' + id).value = item.fixed || '';
     if (item.sizes) {
       item.sizes.forEach((sz, idx) => {
         const s = idx + 1;
-        document.getElementById(`w${s}_${id}`).value = sz.w || '';
-        document.getElementById(`h${s}_${id}`).value = sz.h || '';
-        document.getElementById(`qty${s}_${id}`).value = sz.qty || '';
+        if (s <= 4) {
+          document.getElementById(`w${s}_${id}`).value = sz.w || '';
+          document.getElementById(`h${s}_${id}`).value = sz.h || '';
+          document.getElementById(`qty${s}_${id}`).value = sz.qty || '';
+        }
       });
+      document.getElementById('toggle_size_' + id).checked = true;
+      toggleSizeDisplay(id);
     }
     calcArea(id);
   });
 }
 
-function saveToCloud() {
-  const url = document.getElementById('dbUrl').value.trim();
-  if (!url) { alert('Please paste your Google Web App URL first!'); return; }
+// --- CSV MATERIAL PARSAR ENGINES ---
+function processLibraryCSV(csvText) {
+  const rows = parseCSV(csvText);
+  if (rows.length === 0) return {};
+
+  const tempLib = {};
+  const firstRow = rows[0].map(h => h.toLowerCase().trim());
   
-  const ref = document.getElementById('quotRef').value.trim();
-  const date = document.getElementById('quotDate').value;
-  const clientAddr = document.getElementById('clientAddr').value;
-  const clientPhone = document.getElementById('clientPhone').value;
-  const clientEmail = document.getElementById('clientEmail').value;
-  const subject = document.getElementById('subject').value;
-  const items = serializeItems();
+  const idxCat = firstRow.findIndex(h => h.includes('category'));
+  const idxItem = firstRow.findIndex(h => h.includes('item name') || h === 'item');
+  const idxDesc = firstRow.findIndex(h => h.includes('description') || h.includes('details'));
+  const idxPrice = firstRow.findIndex(h => h.includes('price') || h.includes('rate'));
+  const idxForm = firstRow.findIndex(h => h.includes('formula'));
 
-  const data = { ref, date, clientAddr, clientPhone, clientEmail, subject, items };
+  let activeCategory = "Glass Room";
 
-  fetch(url, {
-    redirect: "follow",
-    method: "POST",
-    body: JSON.stringify(data),
-    headers: { "Content-Type": "text/plain;charset=utf-8" }
-  })
-  .then(res => res.json())
-  .then(response => {
-    alert(`Quotation ${response.ref} successfully saved / updated in your Google Sheet!`);
-  })
-  .catch(err => {
-    console.error(err);
-    alert('Error saving to cloud. Please make sure your Web App is deployed as "Anyone" and the URL is correct.');
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i];
+    if (!row || row.length < 2) continue;
+
+    const name = row[idxItem] ? row[idxItem].trim() : "";
+    const desc = row[idxDesc] ? row[idxDesc].trim() : "";
+    
+    if (!name || name.toLowerCase().includes('item name')) continue;
+
+    let category = activeCategory;
+    if (idxCat !== -1 && row[idxCat]) category = row[idxCat].trim();
+
+    let price = 0;
+    if (idxPrice !== -1 && row[idxPrice]) price = parseFloat(row[idxPrice].replace(/[^0-9.]/g, '')) || 0;
+    
+    const formula = idxForm !== -1 && row[idxForm] ? row[idxForm].trim().toLowerCase() : "";
+
+    if (!tempLib[category]) tempLib[category] = [];
+    tempLib[category].push({ name, desc, rate: price, formula });
+  }
+  return tempLib;
+}
+
+function parseCSV(text) {
+  let lines = []; let row = [""]; let inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    let c = text[i]; let next = text[i+1];
+    if (c === '"') { if (inQuotes && next === '"') { row[row.length - 1] += '"'; i++; } else inQuotes = !inQuotes; }
+    else if (c === ',' && !inQuotes) row.push("");
+    else if ((c === '\r' || c === '\n') && !inQuotes) { if (c === '\r' && next === '\n') i++; lines.push(row); row = [""]; }
+    else row[row.length - 1] += c;
+  }
+  lines.push(row); return lines;
+}
+
+function loadSpreadsheetLibrary() {
+  fetch(SPREADSHEET_CSV_URL)
+    .then(res => res.text())
+    .then(csvText => {
+      parsedLibrary = processLibraryCSV(csvText);
+      rebuildFlatItemLibrary();
+      populateCategorySelector();
+    })
+    .catch(e => console.error("Error connecting spreadsheet catalog:", e));
+}
+
+function rebuildFlatItemLibrary() {
+  flatItemLibrary = {};
+  const datalist = document.getElementById('itemNamesDatalist');
+  datalist.innerHTML = '';
+  Object.keys(parsedLibrary).forEach(cat => {
+    parsedLibrary[cat].forEach(item => {
+      flatItemLibrary[item.name] = item;
+      let opt = document.createElement('option'); opt.value = item.name;
+      datalist.appendChild(opt);
+    });
   });
 }
 
-function loadFromCloud() {
-  const url = document.getElementById('dbUrl').value.trim();
-  if (!url) { alert('Please paste your Google Web App URL first!'); return; }
-  
-  const targetRef = document.getElementById('quotRef').value.trim();
-  if (!targetRef) { alert('Please enter a Quotation Number to load.'); return; }
+function populateCategorySelector() {
+  const sel = document.getElementById('workTypeSelector');
+  sel.innerHTML = '<option value="Custom">Custom Input</option>';
+  Object.keys(parsedLibrary).forEach(cat => {
+    let opt = document.createElement('option'); opt.value = cat; opt.textContent = cat;
+    sel.appendChild(opt);
+  });
+}
 
-  fetch(url)
-  .then(res => res.json())
-  .then(quotes => {
-    const found = quotes.find(q => q.ref.toLowerCase() === targetRef.toLowerCase());
-    if (found) {
-      document.getElementById('quotDate').value = found.date;
-      document.getElementById('clientAddr').value = found.clientAddr;
-      document.getElementById('clientPhone').value = found.clientPhone;
-      document.getElementById('clientEmail').value = found.clientEmail;
-      document.getElementById('subject').value = found.subject;
-      
-      const itemsData = JSON.parse(found.itemsJson);
-      deserializeItems(itemsData);
-      
-      alert(`Quotation ${targetRef} loaded successfully! Click "Generate Quotation" to update the preview.`);
-    } else {
-      alert(`Quotation "${targetRef}" not found in your database.`);
+// --- DYNAMIC MEASUREMENT CONVERTER SYSTEM ---
+function evaluateFormula(formulaStr, globalW, globalL, globalH) {
+  let str = formulaStr.toLowerCase().replace(/×/g, '*').trim();
+  
+  let wVal = 0;
+  let hVal = 0;
+  let qtyVal = 1;
+  
+  if (str.includes('length') && str.includes('width')) {
+    wVal = globalL;
+    hVal = globalW;
+  } else if (str.includes('width') && str.includes('height')) {
+    wVal = globalW;
+    hVal = globalH;
+  } else if (str.includes('length') && str.includes('height')) {
+    wVal = globalL;
+    hVal = globalH;
+  } else {
+    wVal = globalL || globalW;
+    hVal = globalH || globalW;
+  }
+  
+  const qtyMatch = str.match(/\*\s*(\d+)/);
+  if (qtyMatch) {
+    qtyVal = parseInt(qtyMatch[1]) || 1;
+  }
+  
+  return { w: wVal, h: hVal, qty: qtyVal };
+}
+
+function onWorkTypeChange(val) {
+  if (val === 'Custom') return;
+  document.getElementById('subject').value = "Supply & Installation of " + val;
+  document.getElementById('itemsContainer').innerHTML = '';
+  itemCount = 0;
+  
+  const globalW = parseFloat(document.getElementById('globalWidth').value) || 0;
+  const globalL = parseFloat(document.getElementById('globalLength').value) || 0;
+  const globalH = parseFloat(document.getElementById('globalHeight').value) || 0;
+
+  if (!parsedLibrary || !parsedLibrary[val]) {
+    addItem();
+    return;
+  }
+
+  parsedLibrary[val].forEach(item => {
+    const isFixed = !item.formula;
+    addItem(item.name, item.desc, item.rate, isFixed);
+    const currentId = itemCount;
+    
+    if (hasEstimatorBeenRun && item.formula) {
+      const dims = evaluateFormula(item.formula, globalW, globalL, globalH);
+      if (dims.w > 0 && dims.h > 0) {
+        document.getElementById('toggle_size_' + currentId).checked = true;
+        toggleSizeDisplay(currentId);
+        
+        document.getElementById('w1_' + currentId).value = dims.w;
+        document.getElementById('h1_' + currentId).value = dims.h;
+        document.getElementById('qty1_' + currentId).value = dims.qty;
+      }
     }
-  })
-  .catch(err => {
-    console.error(err);
-    alert('Error loading from cloud. Please check your internet connection or URL.');
+    
+    calcArea(currentId);
   });
+  
+  generateQuotation();
 }
 
-// ─── NUMBER TO WORDS ─────────────────────────────────────────────────────────
+function addItem(pName = '', pDesc = '', pRate = '', pFixed = false) {
+  itemCount++; 
+  const id = itemCount;
+  const div = document.createElement('div'); 
+  div.className = 'bg-slate-950 border border-slate-800 hover:border-slate-700 p-4 rounded-xl space-y-3 relative transition'; 
+  div.id = 'item_' + id;
+  
+  const isFixedSelected = pFixed ? 'selected' : '';
+  const isRateSelected = !pFixed ? 'selected' : '';
+
+  div.innerHTML = `
+    <div class="flex items-center justify-between">
+      <span class="text-[10px] uppercase tracking-wider font-extrabold text-brand-200">Material Item #${id}</span>
+      <button onclick="removeItem(${id})" class="text-xs text-slate-500 hover:text-red-400 font-semibold p-1 bg-slate-900 rounded border border-slate-800 transition cursor-pointer">✕ Delete</button>
+    </div>
+    
+    <div class="space-y-2.5">
+      <div class="space-y-1">
+        <label class="text-[9px] text-slate-500 font-black uppercase tracking-wider block">Item Catalog Name</label>
+        <input type="text" id="name_${id}" list="itemNamesDatalist" value="${pName}" oninput="onItemNameInput(${id}, this.value)" class="w-full bg-slate-900 border border-slate-800 text-slate-200 px-3 py-1.5 rounded-lg text-xs focus:outline-none">
+      </div>
+      
+      <div class="space-y-1">
+        <label class="text-[9px] text-slate-500 font-black uppercase tracking-wider block">Technical Specification Details</label>
+        <textarea id="desc_${id}" rows="2" class="w-full bg-slate-900 border border-slate-800 text-slate-200 px-3 py-1.5 rounded-lg text-xs focus:outline-none resize-none">${pDesc}</textarea>
+      </div>
+      
+      <div class="flex items-center gap-1.5 py-0.5 select-none">
+        <input type="checkbox" id="toggle_size_${id}" onchange="toggleSizeDisplay(${id})" class="w-4 h-4 rounded text-brand-700 bg-slate-900 border-slate-800 focus:ring-0 cursor-pointer">
+        <label for="toggle_size_${id}" class="text-[9.5px] text-slate-300 font-bold uppercase tracking-wider cursor-pointer">Custom Area Sizing Matrix</label>
+      </div>
+      
+      <!-- Responsive size array cards -->
+      <div class="bg-corporate-900 border border-slate-850 p-3 rounded-lg space-y-2" id="sizes_container_${id}" style="display:none;">
+        <span class="text-[8.5px] text-brand-200 font-bold uppercase tracking-widest block mb-1">📐 Dynamic Dimensions Setup (cm)</span>
+        
+        <div class="grid grid-cols-[15px_1fr_15px_1fr_25px_1fr] items-center gap-2 text-[10px] text-slate-400">
+          <span class="font-bold text-slate-500 text-center">#1</span>
+          <input type="number" id="w1_${id}" placeholder="W" oninput="calcArea(${id})" class="bg-slate-950 border border-slate-800 text-center py-1 rounded text-slate-200 focus:outline-none text-[11px]">
+          <span class="text-center">×</span>
+          <input type="number" id="h1_${id}" placeholder="H" oninput="calcArea(${id})" class="bg-slate-950 border border-slate-800 text-center py-1 rounded text-slate-200 focus:outline-none text-[11px]">
+          <span class="text-center font-bold">Qty</span>
+          <input type="number" id="qty1_${id}" value="1" oninput="calcArea(${id})" class="bg-slate-950 border border-slate-800 text-center py-1 rounded text-slate-200 focus:outline-none text-[11px]">
+        </div>
+        
+        <div class="grid grid-cols-[15px_1fr_15px_1fr_25px_1fr] items-center gap-2 text-[10px] text-slate-400">
+          <span class="font-bold text-slate-500 text-center">#2</span>
+          <input type="number" id="w2_${id}" placeholder="W" oninput="calcArea(${id})" class="bg-slate-950 border border-slate-800 text-center py-1 rounded text-slate-200 focus:outline-none text-[11px]">
+          <span class="text-center">×</span>
+          <input type="number" id="h2_${id}" placeholder="H" oninput="calcArea(${id})" class="bg-slate-950 border border-slate-800 text-center py-1 rounded text-slate-200 focus:outline-none text-[11px]">
+          <span class="text-center font-bold">Qty</span>
+          <input type="number" id="qty2_${id}" oninput="calcArea(${id})" class="bg-slate-950 border border-slate-800 text-center py-1 rounded text-slate-200 focus:outline-none text-[11px]">
+        </div>
+        
+        <div class="grid grid-cols-[15px_1fr_15px_1fr_25px_1fr] items-center gap-2 text-[10px] text-slate-400">
+          <span class="font-bold text-slate-500 text-center">#3</span>
+          <input type="number" id="w3_${id}" placeholder="W" oninput="calcArea(${id})" class="bg-slate-950 border border-slate-800 text-center py-1 rounded text-slate-200 focus:outline-none text-[11px]">
+          <span class="text-center">×</span>
+          <input type="number" id="h3_${id}" placeholder="H" oninput="calcArea(${id})" class="bg-slate-950 border border-slate-800 text-center py-1 rounded text-slate-200 focus:outline-none text-[11px]">
+          <span class="text-center font-bold">Qty</span>
+          <input type="number" id="qty3_${id}" oninput="calcArea(${id})" class="bg-slate-950 border border-slate-800 text-center py-1 rounded text-slate-200 focus:outline-none text-[11px]">
+        </div>
+        
+        <div class="grid grid-cols-[15px_1fr_15px_1fr_25px_1fr] items-center gap-2 text-[10px] text-slate-400">
+          <span class="font-bold text-slate-500 text-center">#4</span>
+          <input type="number" id="w4_${id}" placeholder="W" oninput="calcArea(${id})" class="bg-slate-950 border border-slate-800 text-center py-1 rounded text-slate-200 focus:outline-none text-[11px]">
+          <span class="text-center">×</span>
+          <input type="number" id="h4_${id}" placeholder="H" oninput="calcArea(${id})" class="bg-slate-950 border border-slate-800 text-center py-1 rounded text-slate-200 focus:outline-none text-[11px]">
+          <span class="text-center font-bold">Qty</span>
+          <input type="number" id="qty4_${id}" oninput="calcArea(${id})" class="bg-slate-950 border border-slate-800 text-center py-1 rounded text-slate-200 focus:outline-none text-[11px]">
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-2 gap-3 pt-1">
+        <div class="space-y-1">
+          <label class="text-[9px] text-slate-500 font-bold uppercase tracking-wider block">Price Strategy</label>
+          <select id="pType_${id}" onchange="calcArea(${id})" class="w-full bg-slate-900 border border-slate-800 text-slate-300 rounded px-2 py-1 text-xs focus:outline-none focus:border-brand-700 cursor-pointer">
+            <option value="Rate" ${isRateSelected}>Per m² (Area Rate)</option>
+            <option value="Fixed" ${isFixedSelected}>Fixed General Fee</option>
+          </select>
+        </div>
+        <div class="space-y-1">
+          <label class="text-[9px] text-slate-500 font-bold uppercase tracking-wider block">Rate amount (AED)</label>
+          <input type="number" id="rate_${id}" value="${pRate}" oninput="calcArea(${id})" class="w-full bg-slate-900 border border-slate-800 text-slate-250 rounded px-3 py-1 font-bold text-xs focus:outline-none focus:border-brand-700">
+        </div>
+      </div>
+    </div>
+    
+    <div id="calc_${id}" data-amount="0" class="text-right pt-2 border-t border-slate-800 text-xs font-bold text-emerald-400">Pending variables...</div>`;
+  document.getElementById('itemsContainer').appendChild(div);
+}
+
+function onItemNameInput(id, val) {
+  if (flatItemLibrary[val]) {
+    document.getElementById('desc_' + id).value = flatItemLibrary[val].desc;
+    document.getElementById('rate_' + id).value = flatItemLibrary[val].rate;
+    const isFixed = !flatItemLibrary[val].formula;
+    document.getElementById('pType_' + id).value = isFixed ? 'Fixed' : 'Rate';
+    calcArea(id);
+  }
+}
+
+function toggleSizeDisplay(id) {
+  const cont = document.getElementById('sizes_container_' + id);
+  cont.style.display = document.getElementById('toggle_size_' + id).checked ? 'block' : 'none';
+  calcArea(id);
+}
+
+function removeItem(id) { 
+  document.getElementById('item_' + id).remove(); 
+  generateQuotation(); 
+}
+
+function calcArea(id) {
+  const rate = parseFloat(document.getElementById('rate_' + id).value) || 0;
+  const pType = document.getElementById('pType_' + id).value;
+  const sizeOn = document.getElementById('toggle_size_' + id).checked;
+  let totalArea = 0; let totalQty = 0; let sizeTxt = [];
+
+  if (sizeOn) {
+    for (let s = 1; s <= 4; s++) {
+      const w = parseFloat(document.getElementById(`w${s}_${id}`).value) || 0;
+      const h = parseFloat(document.getElementById(`h${s}_${id}`).value) || 0;
+      const q = parseFloat(document.getElementById(`qty${s}_${id}`).value) || (s === 1 ? 1 : 0);
+      
+      if (w > 0 && h > 0 && q > 0) {
+        totalArea += (w / 100) * (h / 100) * q;
+        totalQty += q;
+        sizeTxt.push(`${w}×${h}cm (${q})`);
+      }
+    }
+  }
+
+  let amount = 0;
+  let roundedArea = 0;
+  if (pType === 'Fixed') {
+    amount = rate;
+  } else {
+    if (totalArea > 0) {
+      roundedArea = Math.ceil(totalArea * 2) / 2;
+      amount = roundedArea * rate;
+    } else {
+      amount = rate;
+    }
+  }
+
+  const el = document.getElementById('calc_' + id);
+  el.dataset.amount = amount;
+  el.dataset.sizeText = sizeTxt.join(' | ') || '-';
+  el.dataset.roundedArea = roundedArea > 0 ? roundedArea.toFixed(1) : '';
+  el.textContent = "Amount: AED " + amount.toLocaleString('en', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+}
+
+function getItems() {
+  let arr = [];
+  document.querySelectorAll('[id^="item_"]').forEach(row => {
+    const id = row.id.replace('item_', '');
+    const calcEl = document.getElementById('calc_' + id);
+    if (!calcEl) return;
+    arr.push({
+      itemName: document.getElementById('name_' + id).value,
+      desc: document.getElementById('desc_' + id).value,
+      size: calcEl.dataset.sizeText || '-',
+      roundedArea: calcEl.dataset.roundedArea || '',
+      amount: parseFloat(calcEl.dataset.amount) || 0
+    });
+  });
+  return arr;
+}
+
+// --- DYNAMIC ISOMETRIC 3D CAD BLUEPRINT GENERATOR ---
+function generateIsometricSVG(w, l, h) {
+  if (isNaN(w) || isNaN(l) || isNaN(h) || w <= 0 || l <= 0 || h <= 0) {
+    return ''; 
+  }
+  
+  const scale = 110 / Math.max(w, l, h, 100);
+  const angle = 30 * (Math.PI / 180);
+  const cosA = Math.cos(angle);
+  const sinA = Math.sin(angle);
+
+  const dxW = -w * scale * cosA;
+  const dyW = w * scale * sinA;
+  const dxL = l * scale * cosA;
+  const dyL = l * scale * sinA;
+  const dyH = -h * scale;
+
+  const r_p0 = { x: 0, y: 0 };
+  const r_p1 = { x: dxL, y: dyL };
+  const r_p2 = { x: dxL + dxW, y: dyL + dyW };
+  const r_p3 = { x: dxW, y: dyW };
+
+  const r_t0 = { x: r_p0.x, y: r_p0.y + dyH };
+  const r_t1 = { x: r_p1.x, y: r_p1.y + dyH };
+  const r_t2 = { x: r_p2.x, y: r_p2.y + dyH };
+  const r_t3 = { x: r_p3.x, y: r_p3.y + dyH };
+
+  const allX = [r_p0.x, r_p1.x, r_p2.x, r_p3.x, r_t0.x, r_t1.x, r_t2.x, r_t3.x];
+  const allY = [r_p0.y, r_p1.y, r_p2.y, r_p3.y, r_t0.y, r_t1.y, r_t2.y, r_t3.y];
+
+  const minX = Math.min(...allX);
+  const maxX = Math.max(...allX);
+  const minY = Math.min(...allY);
+  const maxY = Math.max(...allY);
+
+  const boxW = maxX - minX;
+  const boxH = maxY - minY;
+
+  const shiftX = 225 - (minX + boxW / 2);
+  const shiftY = 125 - (minY + boxH / 2);
+
+  const p0 = { x: r_p0.x + shiftX, y: r_p0.y + shiftY };
+  const p1 = { x: r_p1.x + shiftX, y: r_p1.y + shiftY };
+  const p2 = { x: r_p2.x + shiftX, y: r_p2.y + shiftY };
+  const p3 = { x: r_p3.x + shiftX, y: r_p3.y + shiftY };
+
+  const t0 = { x: r_t0.x + shiftX, y: r_t0.y + shiftY };
+  const t1 = { x: r_t1.x + shiftX, y: r_t1.y + shiftY };
+  const t2 = { x: r_t2.x + shiftX, y: r_t2.y + shiftY };
+  const t3 = { x: r_t3.x + shiftX, y: r_t3.y + shiftY };
+
+  const offset = 22;
+  const wlStart = { x: p0.x - scale * cosA * offset, y: p0.y + scale * sinA * offset + 5 };
+  const wlEnd = { x: p3.x - scale * cosA * offset, y: p3.y + scale * sinA * offset + 5 };
+  const llStart = { x: p0.x + scale * cosA * offset, y: p0.y + scale * sinA * offset + 5 };
+  const llEnd = { x: p1.x + scale * cosA * offset, y: p1.y + scale * sinA * offset + 5 };
+  const hlStart = { x: p1.x + 25, y: p1.y };
+  const hlEnd = { x: t1.x + 25, y: t1.y };
+
+  return `
+    <div style="display: flex; flex-direction: column; align-items: center; margin-top: 25px; width: 100%; page-break-inside: avoid; break-inside: avoid;">
+      <div style="font-size: 10px; font-weight: 800; color: #1e293b; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1.5px; width: 100%; text-align: center;">📐 Structural CAD Blueprint (Isometric 3D)</div>
+      <div style="width: 100%; display: flex; justify-content: center; align-items: center; background: #fafafa; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 10px; position: relative;">
+        <!-- Clean minimal blue layout scheme styles -->
+        <svg width="420" height="230" viewBox="0 0 450 260">
+          <defs>
+            <linearGradient id="glassWallGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.2" />
+              <stop offset="50%" stop-color="#ffffff" stop-opacity="0.05" />
+              <stop offset="100%" stop-color="#0284c7" stop-opacity="0.1" />
+            </linearGradient>
+            <linearGradient id="metalProfileGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#1e293b" />
+              <stop offset="100%" stop-color="#475569" />
+            </linearGradient>
+            <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 2 L 10 5 L 0 8 z" fill="#0284c7" />
+            </marker>
+          </defs>
+          
+          <polygon points="${p0.x},${p0.y} ${p1.x},${p1.y} ${p2.x},${p2.y} ${p3.x},${p3.y}" fill="none" stroke="#e2e8f0" stroke-width="1.2" stroke-dasharray="3,3" />
+          <polygon points="${p0.x},${p0.y} ${p1.x},${p1.y} ${t1.x},${t1.y} ${t0.x},${t0.y}" fill="url(#glassWallGrad)" stroke="#0284c7" stroke-width="0.5" stroke-opacity="0.3" />
+          <polygon points="${p0.x},${p0.y} ${p3.x},${p3.y} ${t3.x},${t3.y} ${t0.x},${t0.y}" fill="url(#glassWallGrad)" stroke="#0284c7" stroke-width="0.5" stroke-opacity="0.3" />
+          
+          <line x1="${p0.x}" y1="${p0.y}" x2="${t0.x}" y2="${t0.y}" stroke="url(#metalProfileGrad)" stroke-width="3" />
+          <line x1="${p1.x}" y1="${p1.y}" x2="${t1.x}" y2="${t1.y}" stroke="url(#metalProfileGrad)" stroke-width="3" />
+          <line x1="${p2.x}" y1="${p2.y}" x2="${t2.x}" y2="${t2.y}" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="2,2" />
+          <line x1="${p3.x}" y1="${p3.y}" x2="${t3.x}" y2="${t3.y}" stroke="url(#metalProfileGrad)" stroke-width="3" />
+          
+          <polygon points="${t0.x},${t0.y} ${t1.x},${t1.y} ${t2.x},${t2.y} ${t3.x},${t3.y}" fill="none" stroke="url(#metalProfileGrad)" stroke-width="2" />
+          <line x1="${p0.x}" y1="${p0.y}" x2="${p1.x}" y2="${p1.y}" stroke="url(#metalProfileGrad)" stroke-width="1.5" />
+          <line x1="${p0.x}" y1="${p0.y}" x2="${p3.x}" y2="${p3.y}" stroke="url(#metalProfileGrad)" stroke-width="1.5" />
+          
+          <!-- Dimensions rendering guides -->
+          <line x1="${p0.x}" y1="${p0.y}" x2="${wlStart.x}" y2="${wlStart.y}" stroke="#cbd5e1" stroke-width="1" />
+          <line x1="${p3.x}" y1="${p3.y}" x2="${wlEnd.x}" y2="${wlEnd.y}" stroke="#cbd5e1" stroke-width="1" />
+          <line x1="${wlStart.x}" y1="${wlStart.y}" x2="${wlEnd.x}" y2="${wlEnd.y}" stroke="#0284c7" stroke-width="1" marker-start="url(#arrow)" marker-end="url(#arrow)" />
+          <text x="${(wlStart.x + wlEnd.x)/2}" y="${(wlStart.y + wlEnd.y)/2 + 13}" fill="#0f172a" font-size="9.5" font-family="monospace" font-weight="bold" text-anchor="middle">W: ${w} cm</text>
+          
+          <line x1="${p0.x}" y1="${p0.y}" x2="${llStart.x}" y2="${llStart.y}" stroke="#cbd5e1" stroke-width="1" />
+          <line x1="${p1.x}" y1="${p1.y}" x2="${llEnd.x}" y2="${llEnd.y}" stroke="#cbd5e1" stroke-width="1" />
+          <line x1="${llStart.x}" y1="${llStart.y}" x2="${llEnd.x}" y2="${llEnd.y}" stroke="#0284c7" stroke-width="1" marker-start="url(#arrow)" marker-end="url(#arrow)" />
+          <text x="${(llStart.x + llEnd.x)/2}" y="${(llStart.y + llEnd.y)/2 + 13}" fill="#0f172a" font-size="9.5" font-family="monospace" font-weight="bold" text-anchor="middle">L: ${l} cm</text>
+          
+          <line x1="${p1.x}" y1="${p1.y}" x2="${hlStart.x}" y2="${hlStart.y}" stroke="#cbd5e1" stroke-width="1" />
+          <line x1="${t1.x}" y1="${t1.y}" x2="${hlEnd.x}" y2="${hlEnd.y}" stroke="#cbd5e1" stroke-width="1" />
+          <line x1="${hlStart.x}" y1="${hlStart.y}" x2="${hlEnd.x}" y2="${hlEnd.y}" stroke="#0284c7" stroke-width="1" marker-start="url(#arrow)" marker-end="url(#arrow)" />
+          <text x="${hlStart.x + 8}" y="${(hlStart.y + hlEnd.y)/2 + 3}" fill="#0f172a" font-size="9.5" font-family="monospace" font-weight="bold" text-anchor="start">H: ${h} cm</text>
+        </svg>
+      </div>
+    </div>
+  `;
+}
+
+// --- NUMBER TO WORDS CONVERTER ---
 function numberToWords(num) {
   const ones = ['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
   const tens = ['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
@@ -495,241 +1015,439 @@ function numberToWords(num) {
 function formatDate(dateStr) {
   if (!dateStr) return '';
   const d = new Date(dateStr + 'T00:00:00');
-  const day = String(d.getDate()).padStart(2,'0');
-  const month = d.toLocaleString('en-GB', {month: 'long'});
-  const year = d.getFullYear();
-  return `${day}, ${month}, ${year}.`;
+  return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
 }
 
-// ─── GENERATE ────────────────────────────────────────────────────────────────
+// --- GENERATE GORGEOUS HIGH-COMPATIBILITY A4 LAYERS ---
 function generateQuotation() {
-  const ref = document.getElementById('quotRef').value || 'AA-2026-203';
+  const ref = document.getElementById('quotRef').value || 'AA-2026-215';
   const date = formatDate(document.getElementById('quotDate').value);
-  const clientAddr = document.getElementById('clientAddr').value || 'Dubai - United Arab Emirates';
+  const clientAddr = document.getElementById('clientAddr').value || 'Dubai, UAE';
   const clientPhone = document.getElementById('clientPhone').value || 'NA';
   const clientEmail = document.getElementById('clientEmail').value || 'NA';
-  const subject = document.getElementById('subject').value || 'Supply & Installation Works';
+  const subject = document.getElementById('subject').value || 'Supply & Installation of Folding Door';
   const items = getItems();
 
-  if (items.length === 0) { alert('Please add at least one item!'); return; }
-
-  const total = items.reduce((s, i) => s + i.amount, 0);
-
-  // Increment Quotation number storage on successful render
-  const numPart = ref.match(/\d+$/);
-  if (numPart) {
-    const usedNum = parseInt(numPart[0]);
-    localStorage.setItem('nextQuotNum', usedNum + 1);
-    document.getElementById('quotRef').placeholder = "AA-2026-" + (usedNum + 1);
+  if (items.length === 0) { 
+    document.getElementById('quotationDoc').innerHTML = `
+      <div class="w-[210mm] h-[297mm] bg-white rounded-lg flex items-center justify-center text-slate-400 font-medium font-display shadow-2xl">
+        Fill parameters, then click Compile Document to refresh layout blocks.
+      </div>`;
+    return; 
   }
+
+  const isVat = document.getElementById('vatToggle').value === 'yes';
+  const globalW = parseFloat(document.getElementById('globalWidth').value) || 0;
+  const globalL = parseFloat(document.getElementById('globalLength').value) || 0;
+  const globalH = parseFloat(document.getElementById('globalHeight').value) || 0;
+  
+  let total = items.reduce((s, i) => s + i.amount, 0);
+  let vat = isVat ? total * 0.05 : 0;
+  let grand = total + vat;
 
   let rows = '';
   items.forEach((item, idx) => {
     const particularsCell = item.itemName
-      ? `<span class="item-name">${item.itemName}</span><span class="item-desc">${item.desc}</span>`
-      : `<span class="item-desc">${item.desc}</span>`;
+      ? `<strong style="font-size:12px;color:#0f172a;display:block;">${item.itemName}</strong><span style="font-size:10px;color:#475569;margin-top:2px;display:block;line-height:1.4;">${item.desc}</span>`
+      : `<span style="font-size:10px;color:#475569;line-height:1.4;display:block;">${item.desc}</span>`;
 
-    const sizeCell = item.size.split(' | ').join('<br>');
+    const sizeCell = item.size ? item.size.split(' | ').join('<br>') : '-';
+    const areaLabel = (item.roundedArea && item.roundedArea !== '0.0')
+      ? `<br><span style="font-size:9.5px;color:#c0392b;font-weight:800;display:block;margin-top:4px;">Charged Area: ${item.roundedArea} m²</span>`
+      : '';
 
     rows += `<tr>
-      <td style="text-align:center;font-weight:bold;vertical-align:top;">${idx + 1}</td>
-      <td style="vertical-align:top;">${particularsCell}</td>
-      <td style="text-align:center;vertical-align:top;font-size:11px;line-height:1.4;">
+      <td style="text-align:center;font-weight:700;vertical-align:top;border:1px solid #e2e8f0;padding:10px 8px;color:#64748b;">${idx + 1}</td>
+      <td style="vertical-align:top;border:1px solid #e2e8f0;padding:10px 12px;">${particularsCell}</td>
+      <td style="text-align:center;font-weight:600;vertical-align:top;font-size:10.5px;line-height:1.4;border:1px solid #e2e8f0;padding:10px 8px;color:#334155;">
         ${sizeCell}
-        ${item.roundedArea ? '<br><span style="font-size:10px;color:#c0392b;font-weight:bold;">Total Area: '+item.roundedArea+' m²</span>' : ''}
+        ${areaLabel}
       </td>
-      <td style="text-align:right;font-weight:bold;vertical-align:top;">${item.amount > 0 ? item.amount.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}) : '-'}</td>
+      <td style="text-align:right;font-weight:700;vertical-align:top;border:1px solid #e2e8f0;padding:10px 12px;color:#0f172a;font-family:monospace;font-size:11.5px;">
+        ${item.amount > 0 ? item.amount.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}) : '-'}
+      </td>
     </tr>`;
   });
 
+  let vatRow = '';
+  if (isVat) {
+    vatRow = `<tr>
+      <td colspan="2" style="text-align:right;font-weight:700;font-size:11px;background:#fdf5f5!important;border:1px solid #e2e8f0;padding:8px 12px;color:#c0392b;">Subtotal</td>
+      <td style="border:1px solid #e2e8f0;"></td>
+      <td style="text-align:right;font-weight:700;background:#fdf5f5!important;color:#0f172a;border:1px solid #e2e8f0;padding:8px 12px;font-family:monospace;">${total.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})} AED</td>
+    </tr>
+    <tr>
+      <td colspan="2" style="text-align:right;font-weight:700;font-size:11px;background:#fdf5f5!important;border:1px solid #e2e8f0;padding:8px 12px;color:#c0392b;">5% VAT Tariff</td>
+      <td style="border:1px solid #e2e8f0;"></td>
+      <td style="text-align:right;font-weight:700;background:#fdf5f5!important;color:#c0392b;border:1px solid #e2e8f0;padding:8px 12px;font-family:monospace;">${vat.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})} AED</td>
+    </tr>`;
+  }
+
   const watermarkHTML = `
-    <div class="watermark-container">
-      <div class="watermark-text">AHMAD ALUMINIUM &amp; GLASS</div>
+    <div style="position: absolute; top:0; left:0; right:0; bottom:0; display:flex; justify-content:center; align-items:center; pointer-events:none; z-index:0; overflow:hidden;">
+      <div style="font-family: Arial, sans-serif; font-size: 55px; font-weight: 900; color: rgba(192, 57, 43, 0.035); text-transform: uppercase; transform: rotate(-35deg); white-space: nowrap; letter-spacing: 5px;">AHMAD ALUMINIUM &amp; GLASS</div>
     </div>`;
 
   const headerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:12px;border-bottom:3px solid #c0392b;margin-bottom:10px;">
-      <div style="display:flex;align-items:center;gap:15px;">
-        <div style="background:#c0392b;color:white;padding:10px 14px;font-size:24px;font-weight:900;letter-spacing:2px;border-radius:4px;">AHMAD</div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:12px;border-bottom:3px solid #c0392b;margin-bottom:12px;position:relative;z-index:2;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="background:#c0392b;color:white;font-weight:900;font-size:24px;padding:8px 15px;border-radius:6px;letter-spacing:1px;font-family:'Outfit',sans-serif;box-shadow:0 3px 6px rgba(192,57,43,0.15)">AA</div>
         <div>
-          <div style="font-size:16px;font-weight:900;color:#c0392b;letter-spacing:1px;">ALUMINIUM & GLASS CONT</div>
-          <div style="font-size:10px;color:#888;letter-spacing:1px;">#1 ALUMINIUM & GLASS CONT UAE</div>
+          <h1 style="font-size:18px;font-weight:800;color:#0f172a;letter-spacing:0.5px;font-family:'Outfit',sans-serif;margin:0;">AHMAD ALUMINIUM & GLASS</h1>
+          <span style="font-size:10px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:1px;display:block;margin-top:2px;">Premium Architectural Glass & Systems Contracting</span>
         </div>
       </div>
       <div style="text-align:right;">
-        <div style="font-size:38px;font-weight:900;color:#c0392b;letter-spacing:5px;text-transform:uppercase;">QUOTATION</div>
+        <div style="font-size:32px;font-weight:900;color:#c0392b;letter-spacing:4px;text-transform:uppercase;line-height:0.95;font-family:'Outfit',sans-serif;">QUOTATION</div>
       </div>
     </div>
-    <div style="background:#fdf5f5;border:1px solid #e0c0c0;padding:7px 14px;display:flex;gap:30px;font-size:12px;margin-bottom:12px;border-radius:4px;align-items:center;">
-      <span>📞 <strong>+971588490784</strong></span>
+    <div style="background:#fdf5f5;border:1px solid #fecdd3;padding:8px 16px;display:flex;justify-content:space-between;font-size:11px;margin-bottom:15px;border-radius:6px;align-items:center;position:relative;z-index:2;color:#1e293b;">
+      <span>📞 <strong>+971 58 849 0784</strong></span>
       <span>✉️ info@ahmadaluminium.ae</span>
       <span>🌐 www.ahmadaluminium.ae</span>
     </div>`;
 
+  // Render Page 1
   const page1 = `
   <div class="quotation-page">
     ${watermarkHTML}
-    <div style="position:relative;z-index:1;">
-      ${headerHTML}
-      <div class="client-meta-grid">
-        <div>
-          <div class="section-label">Client Details</div>
-          <div><strong>Address:</strong> ${clientAddr}</div>
-          <div><strong>Phone:</strong> &nbsp;${clientPhone}</div>
-          <div><strong>Email:</strong> &nbsp;&nbsp;${clientEmail}</div>
+    <div style="position:relative;z-index:10;display:flex;flex-direction:column;justify-content:space-between;min-height:257mm;">
+      <div>
+        ${headerHTML}
+        
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:15px;font-size:12px;">
+          <div>
+            <div style="font-size:10px;text-transform:uppercase;color:#94a3b8;font-weight:800;border-bottom:1.5px solid #cbd5e1;padding-bottom:3px;margin-bottom:6px;letter-spacing:1px;">Client Details</div>
+            <div><strong>Location Address:</strong> ${clientAddr}</div>
+            <div><strong>Phone Contact:</strong> &nbsp;${clientPhone}</div>
+            <div><strong>Email Address:</strong> &nbsp;&nbsp;${clientEmail}</div>
+          </div>
+          <div>
+            <div style="font-size:10px;text-transform:uppercase;color:#94a3b8;font-weight:800;border-bottom:1.5px solid #cbd5e1;padding-bottom:3px;margin-bottom:6px;letter-spacing:1px;">Proposal Info</div>
+            <div><strong>Reference Number:</strong> <span style="font-family:monospace;font-weight:850;color:#c0392b;">${ref}</span></div>
+            <div><strong>Issued Date:</strong> ${date}</div>
+            <div><strong>Official Email:</strong> info@ahmadaluminium.ae</div>
+          </div>
         </div>
-        <div>
-          <div class="section-label">Quotation Info</div>
-          <div><strong>Quotation No:</strong> ${ref}</div>
-          <div><strong>Date:</strong> ${date}</div>
-          <div><strong>EMAIL:</strong> info@ahmadaluminium.ae</div>
+        
+        <div style="text-align:center;font-weight:700;font-size:13px;color:#c0392b;border-bottom:2px solid #c0392b;border-top:2px solid #c0392b;padding:8px 0;margin-bottom:15px;background:#fdf5f5;text-transform:uppercase;letter-spacing:0.5px;">
+          Subject: ${subject}
+        </div>
+        
+        <table style="width:100%;border-collapse:collapse;font-size:11.5px;margin-bottom:15px;table-layout:fixed;">
+          <thead>
+            <tr>
+              <th style="width:8%;text-align:center;background:#c0392b;color:white;padding:10px 8px;font-weight:800;border:1px solid #c0392b;">Sr.</th>
+              <th style="width:52%;background:#c0392b;color:white;padding:10px 10px;font-weight:800;border:1px solid #c0392b;text-align:left;">Particulars / Material Description</th>
+              <th style="width:22%;text-align:center;background:#c0392b;color:white;padding:10px 8px;font-weight:800;border:1px solid #c0392b;">Sizes (cm)</th>
+              <th style="width:18%;text-align:right;background:#c0392b;color:white;padding:10px 10px;font-weight:800;border:1px solid #c0392b;">Total (AED)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows}
+            ${vatRow}
+            <tr style="background:#f1f5f9!important;border-top:2px solid #c0392b;font-weight:800;">
+              <td colspan="2" style="text-align:right;font-size:12px;border:1px solid #cbd5e1;padding:10px 12px;color:#0f172a;">GRAND TOTAL PROPOSED</td>
+              <td style="text-align:center;border:1px solid #cbd5e1;padding:10px 8px;">-</td>
+              <td style="text-align:right;font-size:13.5px;color:#c0392b;border:1px solid #cbd5e1;padding:10px 12px;font-family:monospace;">${grand.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})} AED</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div style="background:#fdf5f5;border:1px solid #fecdd3;padding:10px 14px;font-size:11.5px;margin-bottom:15px;border-radius:6px;font-weight:700;text-align:center;color:#1e293b;line-height:1.4;">
+          Grand Total proposed in words: <strong style="color:#c0392b;text-transform:uppercase;">${numberToWords(grand)}.</strong>
         </div>
       </div>
-      <div style="text-align:center;font-style:italic;font-weight:bold;font-size:14px;color:#c0392b;border-bottom:2px solid #c0392b;border-top:2px solid #c0392b;padding:8px 0;margin-bottom:15px;">
-        Subject: ${subject}
+      
+      <div>
+        ${generateIsometricSVG(globalW, globalL, globalH)}
+        <div style="display:flex;justify-content:between;align-items:center;font-size:7.5px;color:#94a3b8;font-family:monospace;letter-spacing:1px;border-top:1px solid #f1f5f9;padding-top:8px;margin-top:15px;">
+          <span>AHMAD ALUMINIUM &amp; GLASS L.L.C-FZ</span>
+          <span style="margin-left:auto;">PAGE 1 of 2</span>
+        </div>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th style="width:38px;">Sr.</th>
-            <th>Particulars / Description</th>
-            <th style="width:160px;text-align:center;">Size (cm)</th>
-            <th style="width:120px;text-align:right;">Total Amount (AED)</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows}
-          <tr class="total-row">
-            <td colspan="2" style="text-align:center;font-weight:bold;font-size:13px;">Grand Total</td>
-            <td colspan="2" style="text-align:right;">${total > 0 ? total.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' AED' : '-'}</td>
-          </tr>
-        </tbody>
-      </table>
-      ${total > 0 ? `<div class="amount-words">Grand Total: <strong>${numberToWords(total)}.</strong></div>` : ''}
     </div>
   </div>`;
 
-  const pageBreak = `<div class="page-break-divider">Page 2 Below</div>`;
+  const pageBreak = `<div class="w-full text-center text-[10px] font-mono tracking-widest text-slate-500 py-4 no-print select-none">PAGE BOUNDARY LIMIT</div>`;
 
+  // Render Page 2
   const page2 = `
-  <div class="quotation-page">
+  <div class="quotation-page-footer">
     ${watermarkHTML}
-    <div style="position:relative;z-index:1;">
-      <div style="font-size:11px;color:#999;text-align:right;margin-bottom:12px;">Quotation No: ${ref} &nbsp;|&nbsp; Continued — Page 2</div>
-
-      <div class="doc-section-title">Payment terms:</div>
-      <ul class="doc-list">
-        <li>60% Advance Payment.</li>
-        <li>30% on all material delivery on site before installation.</li>
-        <li>10% after Completion.</li>
-        <li>5% VAT Will be apply after confirmation.</li>
-      </ul>
-      <p style="font-size:12px;margin:8px 0;">(Full balance amount shall be paid after completion of the above said works).</p>
-
-      <div class="doc-section-title" style="margin-top:18px;">Terms &amp; Conditions:</div>
-      <ul class="doc-list">
-        <li>Additional works subject to extra cost and to be agreed prior to start of works.</li>
-        <li>All size mentioned are in CMS / MTRS and is final.</li>
-        <li>Power supply to be provided by the Client.</li>
-        <li>All required approvals to be provided by the client.</li>
-        <li>Validity of This Offer for 07 Days Only.</li>
-      </ul>
-
-      <div style="font-size:12px;margin:18px 0 10px;line-height:1.8;font-weight:bold;">
-        Hope the above Quote is Satisfactory and meets your requirements and await your confirmed LPO.<br>
-        Kindly contact the below personal for any clarifications as required
-      </div>
-
-      <!-- SIGNATURE + STAMP ROW -->
-      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:30px;margin-bottom:25px;">
-        <div style="font-size:12px;line-height:2.2;">
-          <div style="font-weight:bold;">Project Manager,</div>
-          <div style="font-weight:bold;font-size:13px;">Ahmad Latif</div>
-          <div>+971 58 84 90 784</div>
-        </div>
-        
-        <!-- COMPANY STAMP (SVG RECREATED EXACTLY) -->
-        <div style="text-align:center; z-index: 10; position: relative;">
-          <svg viewBox="0 0 200 200" width="130" height="130" style="opacity: 0.95; transform: rotate(-10deg); filter: drop-shadow(0px 0px 1px rgba(29, 18, 95, 0.3));">
-            <circle cx="100" cy="100" r="95" fill="none" stroke="#1d125f" stroke-width="3" />
-            <circle cx="100" cy="100" r="90" fill="none" stroke="#1d125f" stroke-width="1" />
-            <circle cx="100" cy="100" r="62" fill="none" stroke="#1d125f" stroke-width="1" />
-            <circle cx="100" cy="100" r="57" fill="none" stroke="#1d125f" stroke-width="2.5" />
-            
-            <path id="topPath" d="M 25,100 A 75,75 0 0,1 175,100" fill="none" stroke="none" />
-            <path id="bottomPath" d="M 175,100 A 75,75 0 0,1 25,100" fill="none" stroke="none" />
-            
-            <text fill="#1d125f" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="8.2" letter-spacing="0.3">
-              <textPath href="#topPath" startOffset="50%" text-anchor="middle">
-                احمد الالمنيوم اند جلاس كونتراكتور ش.ذ.م.م - منطقة حرة
-              </textPath>
-            </text>
-            
-            <text fill="#1d125f" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="7.5" letter-spacing="0.3">
-              <textPath href="#bottomPath" startOffset="50%" text-anchor="middle">
-                AHMAD ALUMINIUM AND GLASS CONTRACTOR L.L.C-FZ
-              </textPath>
-            </text>
-            
-            <text x="20" y="104" fill="#1d125f" font-size="12" font-weight="bold">★</text>
-            <text x="169" y="104" fill="#1d125f" font-size="12" font-weight="bold">★</text>
-            
-            <text x="100" y="108" fill="#1d125f" font-family="Arial Black, Impact, sans-serif" font-weight="900" font-size="13" text-anchor="middle" letter-spacing="0.5">
-              DUBAI - U.A.E
-            </text>
-          </svg>
+    <div style="position:relative;z-index:10;display:flex;flex-direction:column;justify-content:space-between;min-height:257mm;">
+      
+      <div>
+        <div style="font-size:10px;color:#94a3b8;font-family:monospace;display:flex;justify-content:between;border-bottom:1px solid #e2e8f0;padding-bottom:4px;margin-bottom:15px;letter-spacing:0.5px;">
+          <span>Reference No: <strong style="color:#c0392b;">${ref}</strong></span>
+          <span style="margin-left:auto;">Continued Proposal Details</span>
         </div>
 
-        <!-- SIGNATURE -->
-        <div style="text-align:center;">
-          <div style="font-size:11px;color:#666;margin-bottom:6px;">Signature:</div>
-          <div style="font-family:cursive;font-size:28px;color:#222;border-bottom:1px solid #444;padding:0 20px 4px;display:inline-block;">Ahmad</div>
-        </div>
-      </div>
+        <div style="font-size:11.5px;color:#c0392b;font-weight:800;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #cbd5e1;padding-bottom:3px;">1. Payment schedule milestones:</div>
+        <ul style="list-style:none;padding:0;margin:0 0 15px 0;font-size:11px;line-height:1.8;color:#334155;">
+          <li style="margin-bottom:3px;"><span style="color:#c0392b;font-weight:bold;">✓ 60%</span> Advance Deposit Payment immediately on confirmation for material launching.</li>
+          <li style="margin-bottom:3px;"><span style="color:#c0392b;font-weight:bold;">✓ 30%</span> on delivery of all structural glass and aluminium materials on site.</li>
+          <li style="margin-bottom:3px;"><span style="color:#c0392b;font-weight:bold;">✓ 10%</span> balance handover payment on completion of works.</li>
+        </ul>
+        <p style="font-size:10.5px;color:#64748b;margin:-10px 0 15px 0;font-style:italic;">(All outstanding balance sum shall be settled immediately upon completion of site installation works).</p>
 
-      <!-- BANK DETAILS -->
-      <div style="border-top:2px solid #c0392b;padding-top:15px;">
-        <h3 style="color:#c0392b;font-size:14px;font-weight:bold;text-align:center;margin-bottom:12px;text-transform:uppercase;letter-spacing:2px;">Company Bank Account Details</h3>
-        <div class="bank-grid">
-          <div class="bank-card">
-            <strong>1) Company — Mashreq Bank</strong>
-            Account Title: Ahmad Aluminium and Glass Contractor LLC FZ<br>
-            <span class="bank-iban">IBAN: AE3603 3000 0019 1021 3481 7</span><br>
-            Account No: 019 1021 34817<br>
-            Swift: BOMLAEAD
+        <div style="font-size:11.5px;color:#c0392b;font-weight:800;margin:15px 0 6px 0;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #cbd5e1;padding-bottom:3px;">2. General Terms &amp; Conditions:</div>
+        <ul style="list-style:none;padding:0;margin:0 0 15px 0;font-size:11px;line-height:2;color:#334155;">
+          <li style="margin-bottom:2px;"><span style="color:#c0392b;font-weight:bold;">✓</span> Additional or variations to the layout dimensions are subject to extra agreements prior to start of works.</li>
+          <li style="margin-bottom:2px;"><span style="color:#c0392b;font-weight:bold;">✓</span> Work sizes and structural descriptions outlined inside this contract are final.</li>
+          <li style="margin-bottom:2px;"><span style="color:#c0392b;font-weight:bold;">✓</span> Primary high-voltage electrical power supply must be provided at the site by the Client.</li>
+          <li style="margin-bottom:2px;"><span style="color:#c0392b;font-weight:bold;">✓</span> All required local approvals, municipal NOCs, and clearance permissions must be processed by the client.</li>
+          <li style="margin-bottom:2px;"><span style="color:#c0392b;font-weight:bold;">✓</span> Commercial validity of this design offer stands for <strong>07 Business Days from date of issues.</strong></li>
+        </ul>
+
+         <div style="font-size:11px;margin:20px 0 15px;line-height:1.8;font-weight:600;color:#1e293b;text-align:center;background:#f8fafc;padding:10px;border-radius:6px;border:1px solid #e2e8f0;">
+          Hoping the above commercial details are satisfactory. We await your confirmed confirmation. <br>
+          Kindly contact the supervisor on contact listings below for any engineering queries.
+        </div>
+
+        <!-- STAMP & SUPERVISOR SIGS GRIDS -->
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:25px;margin-bottom:25px;border-bottom:1.5px solid #cbd5e1;padding-bottom:20px;">
+          <div style="font-size:11px;line-height:2.2;color:#334155;">
+            <div style="font-size:9px;color:#94a3b8;font-weight:800;text-transform:uppercase;">Contract Administrator</div>
+            <strong style="color:#0f172a;font-size:13px;display:block;margin-top:2px;">Ahmad Latif</strong>
+            <div style="font-weight:600;color:#64748b;font-size:10px;">Supervisor Estimator</div>
+            <div style="color:#c0392b;font-weight:700;font-size:10.5px;margin-top:2px;">📞 +971 58 849 0784</div>
           </div>
-          <div class="bank-card">
-            <strong>2) CEO — Emirates NBD</strong>
-            Account Title: Ahmad Latif<br>
-            <span class="bank-iban">IBAN: AE28 0260 0010 1580 3625 901</span><br>
-            Account No: 10 1580 3625 901<br>
-            Swift: EBILAEAD
+          
+          <div style="text-align:center;">
+            <svg viewBox="0 0 200 200" width="120" height="120" style="opacity: 0.95; transform: rotate(-8deg); filter: drop-shadow(0px 2px 4px rgba(29, 18, 95, 0.15));">
+              <circle cx="100" cy="100" r="95" fill="none" stroke="#1d125f" stroke-width="3" />
+              <circle cx="100" cy="100" r="90" fill="none" stroke="#1d125f" stroke-width="1" />
+              <circle cx="100" cy="100" r="62" fill="none" stroke="#1d125f" stroke-width="1" />
+              <circle cx="100" cy="100" r="57" fill="none" stroke="#1d125f" stroke-width="2.5" />
+              
+              <path id="topPath" d="M 25,100 A 75,75 0 0,1 175,100" fill="none" stroke="none" />
+              <path id="bottomPath" d="M 175,100 A 75,75 0 0,1 25,100" fill="none" stroke="none" />
+              
+              <text fill="#1d125f" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="8" letter-spacing="0.3">
+                <textPath href="#topPath" startOffset="50%" text-anchor="middle">
+                  احمد الالمنيوم اند جلاس كونتراكتور ش.ذ.م.م - منطقة حرة
+                </textPath>
+              </text>
+              
+              <text fill="#1d125f" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="7.5" letter-spacing="0.3">
+                <textPath href="#bottomPath" startOffset="50%" text-anchor="middle">
+                  AHMAD ALUMINIUM AND GLASS CONTRACTOR L.L.C-FZ
+                </textPath>
+              </text>
+              
+              <text x="20" y="104" fill="#1d125f" font-size="12" font-weight="bold">★</text>
+              <text x="169" y="104" fill="#1d125f" font-size="12" font-weight="bold">★</text>
+              
+              <text x="100" y="108" fill="#1d125f" font-family="Arial Black, Impact, sans-serif" font-weight="900" font-size="13" text-anchor="middle" letter-spacing="0.5">
+                DUBAI - U.A.E
+              </text>
+            </svg>
           </div>
-          <div class="bank-card">
-            <strong>3) CEO — Mashreq Bank</strong>
-            Account Title: Ahmad Latif<br>
-            <span class="bank-iban">IBAN: AE7203 3000 0019 1009 2060 2</span><br>
-            Account No: 019 1009 20602<br>
-            Swift: BOMLAEAD
+
+          <div style="text-align:center;">
+            <div style="font-size:9px;color:#94a3b8;font-weight:800;margin-bottom:12px;text-transform:uppercase;">Approved Signature</div>
+            <div style="font-family:cursive;font-size:24px;color:#0f172a;border-bottom:1.5px solid #475569;padding:0 20px 4px;display:inline-block;font-weight:700;">Ahmad</div>
           </div>
         </div>
+
+        <!-- BANK ACCOUNT CHANNELS -->
+        <div>
+          <h3 style="color:#c0392b;font-size:11.5px;font-weight:900;text-align:center;margin-bottom:10px;text-transform:uppercase;letter-spacing:1.5px;">Corporate Directory Wire Transfer Accounts</h3>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            
+            <div style="background:#fdf5f5;border:1px solid #fecdd3;padding:10px 14px;font-size:11px;border-radius:6px;display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <strong style="color:#c0392b;font-size:11.5px;display:block;margin-bottom:2px;">1) Company Corporate Account — Mashreq Bank</strong>
+                Title: Ahmad Aluminium and Glass Contractor LLC FZ<br>
+                <small style="color:#64748b;font-weight:600;">Account No: 019 1021 34817 &nbsp;|&nbsp; Swift: BOMLAEAD</small>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;background:white;border:1px solid #e2e8f0;padding:4px 8px;border-radius:4px;">
+                <code style="font-family:monospace;font-weight:700;color:#0f172a;font-size:10px;">AE36 0330 0000 1910 2134 817</code>
+                <button onclick="copyToClipboard('AE36 0330 0000 1910 2134 817', this)" style="border:none;background:none;cursor:pointer;color:#64748b;font-size:11px;" title="Copy IBAN">📋</button>
+              </div>
+            </div>
+
+            <div style="background:#fdf5f5;border:1px solid #fecdd3;padding:10px 14px;font-size:11px;border-radius:6px;display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <strong style="color:#c0392b;font-size:11.5px;display:block;margin-bottom:2px;">2) Chief Executive Register — Emirates NBD</strong>
+                Title: Ahmad Latif<br>
+                <small style="color:#64748b;font-weight:600;">Account No: 10 1580 3625 901 &nbsp;|&nbsp; Swift: EBILAEAD</small>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;background:white;border:1px solid #e2e8f0;padding:4px 8px;border-radius:4px;">
+                <code style="font-family:monospace;font-weight:700;color:#0f172a;font-size:10px;">AE28 0260 0010 1580 3625 901</code>
+                <button onclick="copyToClipboard('AE28 0260 0010 1580 3625 901', this)" style="border:none;background:none;cursor:pointer;color:#64748b;font-size:11px;" title="Copy IBAN">📋</button>
+              </div>
+            </div>
+
+            <div style="background:#fdf5f5;border:1px solid #fecdd3;padding:10px 14px;font-size:11px;border-radius:6px;display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <strong style="color:#c0392b;font-size:11.5px;display:block;margin-bottom:2px;">3) Secondary Operational Line — Mashreq Bank</strong>
+                Title: Ahmad Latif<br>
+                <small style="color:#64748b;font-weight:600;">Account No: 019 1009 20602 &nbsp;|&nbsp; Swift: BOMLAEAD</small>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;background:white;border:1px solid #e2e8f0;padding:4px 8px;border-radius:4px;">
+                <code style="font-family:monospace;font-weight:700;color:#0f172a;font-size:10px;">AE72 0330 0000 1910 0920 602</code>
+                <button onclick="copyToClipboard('AE72 0330 0000 1910 0920 602', this)" style="border:none;background:none;cursor:pointer;color:#64748b;font-size:11px;" title="Copy IBAN">📋</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
       </div>
+
+      <div style="display:flex;justify-content:between;align-items:center;font-size:7.5px;color:#94a3b8;font-family:monospace;letter-spacing:1px;border-top:1px solid #f1f5f9;padding-top:8px;margin-top:15px;width:100%;">
+        <span>AHMAD ALUMINIUM &amp; GLASS L.L.C-FZ</span>
+        <span style="margin-left:auto;">PAGE 2 of 2</span>
+      </div>
+
     </div>
   </div>`;
 
   document.getElementById('quotationDoc').innerHTML = page1 + pageBreak + page2;
 }
 
-function downloadPDF() {
-  const s = document.createElement('style');
-  s.textContent = '@media print { body{background:white!important;} .app-header,.form-panel,.preview-toolbar{display:none!important;} .container{display:block!important;} .preview-panel{padding:0!important;background:white!important;} .quotation-page{box-shadow:none!important;width:100%!important;} .page-break-divider{display:none!important;} }';
-  document.head.appendChild(s);
-  window.print();
-  setTimeout(() => document.head.removeChild(s), 1000);
+// --- Clipboard Copy Helper ---
+function copyToClipboard(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    const originalText = btn.innerHTML;
+    btn.innerHTML = "✅";
+    setTimeout(() => {
+      btn.innerHTML = originalText;
+    }, 1500);
+  });
 }
 
-// Start with one empty item
-addItem();
+// --- DYNAMIC PDF EXPORT ROUTINE ---
+function downloadPDF() {
+  const ref = document.getElementById('quotRef').value || 'AA-2026-215';
+  const element = document.getElementById('quotationDoc');
+  
+  if (!element || element.innerHTML.includes('Compile Document')) {
+    alert("Compile and generate the document representation first.");
+    return;
+  }
+
+  const opt = {
+    margin:       0,
+    filename:     `AHMAD_ALUMINIUM_QUOTATION_${ref}.pdf`,
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2, useCORS: true, logging: false },
+    jsPDF:        { unit: 'pt', format: 'a4', orientation: 'portrait' }
+  };
+
+  // Check IndexedDB persistent folders selection permission
+  if (savedFolderHandle) {
+    verifyPermission(savedFolderHandle, true).then(hasPermission => {
+      if (hasPermission) {
+        html2pdf().set(opt).from(element).output('blob').then(blob => {
+          savedFolderHandle.getFileHandle(`AHMAD_ALUMINIUM_QUOTATION_${ref}.pdf`, { create: true })
+            .then(fileHandle => fileHandle.createWritable())
+            .then(writable => {
+              return writable.write(blob).then(() => writable.close());
+            })
+            .then(() => {
+              alert(`Successfully auto-saved to folder archive: "AHMAD_ALUMINIUM_QUOTATION_${ref}.pdf"`);
+              incrementReferenceNumber();
+            })
+            .catch(e => {
+              console.error("Direct saving pipeline failure:", e);
+              fallbackDownload(opt, element);
+            });
+        });
+      } else {
+        fallbackDownload(opt, element);
+      }
+    });
+  } else {
+    fallbackDownload(opt, element);
+  }
+}
+
+function fallbackDownload(opt, element) {
+  html2pdf().set(opt).from(element).save().then(() => {
+    incrementReferenceNumber();
+  });
+}
+
+function incrementReferenceNumber() {
+  const refVal = document.getElementById('quotRef').value;
+  const numPart = refVal.match(/\d+$/);
+  if (numPart) {
+    const usedNum = parseInt(numPart[0]);
+    localStorage.setItem('nextQuotNum', usedNum + 1);
+    document.getElementById('quotRef').value = "AA-" + currentYear + "-" + (usedNum + 1);
+  }
+}
+
+function applySmartEstimator() {
+  hasEstimatorBeenRun = true;
+  const cat = document.getElementById('workTypeSelector').value;
+  onWorkTypeChange(cat === 'Custom' ? 'Glass Room' : cat);
+  hasEstimatorBeenRun = false;
+}
+
+function triggerSilentCloudSave() {
+  document.getElementById('syncStatusText').textContent = "SAVING...";
+  document.getElementById('syncStatusText').className = "text-yellow-400 font-bold";
+  
+  const data = {
+    ref: document.getElementById('quotRef').value,
+    clientAddr: document.getElementById('clientAddr').value,
+    clientPhone: document.getElementById('clientPhone').value,
+    clientEmail: document.getElementById('clientEmail').value,
+    subject: document.getElementById('subject').value,
+    date: document.getElementById('quotDate').value,
+    items: getItems()
+  };
+  
+  fetch(DB_URL, { 
+    method: "POST", 
+    body: JSON.stringify(data),
+    mode: "no-cors",
+    headers: { "Content-Type": "text/plain;charset=utf-8" }
+  })
+  .then(() => {
+    document.getElementById('syncStatusText').textContent = "CONNECTED";
+    document.getElementById('syncStatusText').className = "text-emerald-400 font-bold";
+    setTimeout(fetchRecentQuotes, 1000);
+  })
+  .catch(e => {
+    document.getElementById('syncStatusText').textContent = "SYNC ERROR";
+    document.getElementById('syncStatusText').className = "text-red-400 font-bold";
+    console.error(e);
+  });
+}
+
+function shareToWhatsApp() {
+  const phone = document.getElementById('clientPhone').value.replace(/\D/g,'');
+  const msg = encodeURIComponent("Hello! Please find your Quotation detail Ref: " + document.getElementById('quotRef').value + " from Ahmad Aluminium & Glass Cont.");
+  window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+}
+
+function clearDraft() {
+  if (confirm("Verify: Re-initialize and wipe draft settings?")) {
+    document.getElementById('clientAddr').value = '';
+    document.getElementById('clientPhone').value = '';
+    document.getElementById('clientEmail').value = '';
+    document.getElementById('subject').value = '';
+    document.getElementById('itemsContainer').innerHTML = '';
+    addItem();
+    generateQuotation();
+  }
+}
+
+window.onload = () => {
+  let currentSavedRef = localStorage.getItem('nextQuotNum') || '215';
+  document.getElementById('quotRef').value = "AA-" + currentYear + "-" + currentSavedRef;
+  document.getElementById('quotDate').valueAsDate = new Date();
+
+  loadSpreadsheetLibrary();
+  initFolderSelection();
+  fetchRecentQuotes();
+  addItem();
+};
 </script>
 </body>
 </html>
