@@ -506,6 +506,7 @@ function filterRecentQuotes() {
   renderRecentQuotes(filtered);
 }
 
+// Loads a selected quotation configuration from database logs
 function loadQuoteFromDirectory(q) {
   document.getElementById('quotRef').value = q.ref || '';
   document.getElementById('clientAddr').value = q.clientAddr || '';
