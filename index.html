@@ -30,10 +30,6 @@
             600: '#e53e3e',
             700: '#c0392b', // Ahmad Aluminium primary maroon hue
             800: '#9b2c2c',
-          },
-          corporate: {
-            900: '#0f172a',
-            950: '#020617',
           }
         }
       }
@@ -127,161 +123,161 @@
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: #0f172a;
+    background: #f1f5f9;
   }
   ::-webkit-scrollbar-thumb {
-    background: #334155;
+    background: #cbd5e1;
     border-radius: 3px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #475569;
+    background: #94a3b8;
   }
 </style>
 </head>
-<body class="bg-corporate-950 font-sans text-slate-100 min-h-screen antialiased flex flex-col">
+<body class="bg-slate-100 font-sans text-slate-705 min-h-screen antialiased flex flex-col">
 
 <!-- Top Corporate Navigation Header -->
-<div class="bg-corporate-900 border-b border-slate-800 px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sticky top-0 z-50 shadow-xl no-print">
+<div class="bg-white border-b border-slate-200 px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sticky top-0 z-50 shadow-sm no-print animate-fade-in">
   <div class="flex items-center gap-3">
-    <div class="bg-brand-700/10 border border-brand-600/20 p-2.5 rounded-xl text-brand-600 shadow-md">
+    <div class="bg-brand-50 border border-brand-100 p-2.5 rounded-xl text-brand-700 shadow-sm">
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
       </svg>
     </div>
     <div>
-      <h1 class="text-base font-bold font-display text-white tracking-wide leading-tight">🏢 Ahmad Aluminium & Glass Cont</h1>
-      <p class="text-[11px] text-slate-400 font-medium">Dubai, UAE &middot; Official Quotation &amp; Project Engineering Studio</p>
+      <h1 class="text-base font-bold font-display text-slate-900 tracking-wide leading-tight">🏢 Ahmad Aluminium & Glass Contractor</h1>
+      <p class="text-[11px] text-slate-500 font-medium">Dubai, UAE &middot; Official Quotation &amp; Project Engineering Studio</p>
     </div>
   </div>
   
   <div class="flex items-center gap-2">
-    <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-950 border border-slate-800 text-[10.5px] font-mono text-slate-300">
+    <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-[10.5px] font-mono text-slate-600 shadow-inner">
       <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
       <span>Database Sync:</span>
-      <span id="syncStatusText" class="text-emerald-400 font-bold">CONNECTED</span>
+      <span id="syncStatusText" class="text-emerald-600 font-bold">CONNECTED</span>
     </div>
   </div>
 </div>
 
 <!-- Main Body Application Workspace -->
-<div class="grow grid grid-cols-1 xl:grid-cols-[410px_1fr] overflow-hidden">
+<div class="grow grid grid-cols-1 xl:grid-cols-[410px_1fr] xl:max-h-[calc(100vh-73px)] xl:overflow-hidden">
   
   <!-- LEFT SIDEBAR FORM AREA (Form Controls and Inputs) -->
-  <div class="bg-corporate-900 border-r border-slate-800 p-5 overflow-y-auto space-y-5 no-print select-none">
+  <div class="bg-white border-r border-slate-200 p-5 xl:overflow-y-auto space-y-5 no-print select-none">
     
     <!-- 1) Automatic Sync Settings and directory saving handles -->
-    <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3 shadow-inner">
-      <div class="flex items-center gap-1.5 text-brand-200 text-xs font-bold uppercase tracking-widest border-b border-slate-800 pb-2">
-        <svg class="w-3.5 h-3.5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-4 space-y-3 shadow-sm">
+      <div class="flex items-center gap-1.5 text-brand-700 text-xs font-bold uppercase tracking-widest border-b border-slate-200 pb-2">
+        <svg class="w-3.5 h-3.5 text-brand-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20"></path>
         </svg>
         <span>Automatic Download Directory</span>
       </div>
-      <button onclick="selectAutoSaveFolder()" class="w-full bg-brand-700 hover:bg-brand-600 active:bg-brand-800 text-white py-2 px-3 rounded-lg text-xs font-bold transition duration-150 cursor-pointer shadow">
+      <button onclick="selectAutoSaveFolder()" class="w-full bg-brand-700 hover:bg-brand-600 active:bg-brand-800 text-white py-2 px-3 rounded-lg text-xs font-bold transition duration-150 cursor-pointer shadow-sm">
         📂 Choose Local Save Folder
       </button>
-      <div id="folderStatus" class="text-[10px] text-slate-400">
+      <div id="folderStatus" class="text-[10px] text-slate-500">
         Status: Saving inside browser's default Downloads directory
       </div>
     </div>
 
     <!-- 2) Database History Logs Directory search -->
-    <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3 shadow-inner">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-        <span class="text-brand-200 text-xs font-bold uppercase tracking-widest">Search Recent Quotations</span>
-        <button onclick="fetchRecentQuotes()" class="p-1 px-2 text-[10px] font-semibold bg-slate-900 border border-slate-800 hover:text-brand-200 hover:bg-slate-850 duration-150 rounded cursor-pointer flex items-center gap-1">
+    <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-4 space-y-3 shadow-sm">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+        <span class="text-brand-700 text-xs font-bold uppercase tracking-widest">Search Recent Quotations</span>
+        <button onclick="fetchRecentQuotes()" class="p-1 px-2 text-[10px] font-semibold bg-white border border-slate-200 text-slate-700 hover:text-brand-700 hover:bg-slate-100 duration-150 rounded cursor-pointer flex items-center gap-1 shadow-sm">
           🔄 Reload
         </button>
       </div>
-      <input type="text" id="searchQuotes" oninput="filterRecentQuotes()" placeholder="Search client address, references..." class="w-full px-3 py-1.5 bg-slate-900 border border-slate-800 text-slate-200 placeholder-slate-500 rounded-lg text-xs focus:outline-none focus:border-brand-700 transition">
+      <input type="text" id="searchQuotes" oninput="filterRecentQuotes()" placeholder="Search client address, references..." class="w-full px-3 py-1.5 bg-white border border-slate-200 text-slate-800 placeholder-slate-400 rounded-lg text-xs focus:outline-none focus:border-brand-700 focus:ring-1 focus:ring-brand-700 transition">
       
-      <div id="recentQuotesList" class="max-h-[120px] overflow-y-auto bg-slate-900/40 rounded-lg text-xs border border-slate-850">
-        <div class="text-center text-slate-500 py-6">Connecting Google Database...</div>
+      <div id="recentQuotesList" class="max-h-[120px] overflow-y-auto bg-white rounded-lg text-xs border border-slate-200 shadow-inner">
+        <div class="text-center text-slate-400 py-6">Connecting Google Database...</div>
       </div>
     </div>
 
     <!-- 3) Primary Quotation Info Properties panel -->
     <div class="space-y-4">
-      <div class="border-b border-slate-800 pb-2">
-        <h2 class="text-slate-300 text-xs font-bold uppercase tracking-widest flex items-center gap-1.5 text-brand-600">
+      <div class="border-b border-slate-200 pb-2">
+        <h2 class="text-slate-700 text-xs font-bold uppercase tracking-widest flex items-center gap-1.5 text-brand-700">
           Proposal Metadata Properties
         </h2>
       </div>
 
       <div class="space-y-1.5">
-        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">👷 Select Works Category Option</label>
-        <select id="workTypeSelector" onchange="onWorkTypeChange(this.value)" class="w-full bg-slate-950 border border-slate-800 text-slate-200 px-3 py-2 rounded-lg text-xs focus:outline-none focus:border-brand-700 cursor-pointer">
+        <label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">👷 Select Works Category Option</label>
+        <select id="workTypeSelector" onchange="onWorkTypeChange(this.value)" class="w-full bg-white border border-slate-200 text-slate-850 px-3 py-2 rounded-lg text-xs focus:outline-none focus:border-brand-700 cursor-pointer shadow-sm">
           <option value="Custom">Custom / Manual Input</option>
         </select>
       </div>
 
       <div class="grid grid-cols-2 gap-3.5">
         <div class="space-y-1">
-          <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Reference Code</label>
-          <input type="text" id="quotRef" placeholder="AA-2026-215" class="w-full bg-slate-950 border border-slate-800 text-slate-200 px-3 py-1.5 rounded-lg text-xs focus:outline-none focus:border-brand-700 font-mono">
+          <label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Reference Code</label>
+          <input type="text" id="quotRef" placeholder="AA-2026-215" class="w-full bg-white border border-slate-200 text-slate-800 px-3 py-1.5 rounded-lg text-xs focus:outline-none focus:border-brand-700 font-mono shadow-sm">
         </div>
         <div class="space-y-1">
-          <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Proposal Date</label>
-          <input type="date" id="quotDate" class="w-full bg-slate-950 border border-slate-800 text-slate-200 px-2 py-1.5 rounded-lg text-xs focus:outline-none focus:border-brand-700">
+          <label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Proposal Date</label>
+          <input type="date" id="quotDate" class="w-full bg-white border border-slate-200 text-slate-800 px-2 py-1.5 rounded-lg text-xs focus:outline-none focus:border-brand-700 shadow-sm">
         </div>
       </div>
 
       <div class="space-y-1">
-        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Client Destination Address</label>
-        <input type="text" id="clientAddr" placeholder="Al Sufouh, Dubai" class="w-full bg-slate-950 border border-slate-800 text-slate-200 px-3 py-1.5 rounded-lg text-xs focus:outline-none focus:border-brand-700">
+        <label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Client Destination Address</label>
+        <input type="text" id="clientAddr" placeholder="Al Sufouh, Dubai" class="w-full bg-white border border-slate-200 text-slate-800 px-3 py-1.5 rounded-lg text-xs focus:outline-none focus:border-brand-700 shadow-sm">
       </div>
 
       <div class="grid grid-cols-2 gap-3.5">
         <div class="space-y-1">
-          <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Client Phone Contact</label>
-          <input type="text" id="clientPhone" placeholder="+971 58 849 0784" class="w-full bg-slate-950 border border-slate-800 text-slate-200 px-3 py-1.5 rounded-lg text-xs focus:outline-none focus:border-brand-700">
+          <label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Client Phone Contact</label>
+          <input type="text" id="clientPhone" placeholder="+971 58 849 0784" class="w-full bg-white border border-slate-200 text-slate-800 px-3 py-1.5 rounded-lg text-xs focus:outline-none focus:border-brand-700 shadow-sm">
         </div>
         <div class="space-y-1">
-          <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Client Email ID</label>
-          <input type="text" id="clientEmail" placeholder="client@domain.com" class="w-full bg-slate-950 border border-slate-800 text-slate-200 px-3 py-1.5 rounded-lg text-xs focus:outline-none focus:border-brand-700">
+          <label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Client Email ID</label>
+          <input type="text" id="clientEmail" placeholder="client@domain.com" class="w-full bg-white border border-slate-200 text-slate-800 px-3 py-1.5 rounded-lg text-xs focus:outline-none focus:border-brand-700 shadow-sm">
         </div>
       </div>
 
       <div class="space-y-1">
-        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Quotation Subject Header</label>
-        <input type="text" id="subject" placeholder="Glass Room Work" class="w-full bg-slate-950 border border-slate-800 text-slate-200 px-3 py-1.5 rounded-lg text-xs focus:outline-none focus:border-brand-700">
+        <label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Quotation Subject Header</label>
+        <input type="text" id="subject" placeholder="Glass Room Work" class="w-full bg-white border border-slate-200 text-slate-800 px-3 py-1.5 rounded-lg text-xs focus:outline-none focus:border-brand-700 shadow-sm">
       </div>
 
       <div class="space-y-1">
-        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">VAT Settings</label>
-        <select id="vatToggle" onchange="generateQuotation();" class="w-full bg-slate-950 border border-slate-800 text-slate-200 px-3 py-2 rounded-lg text-xs focus:outline-none focus:border-brand-700 cursor-pointer font-semibold">
+        <label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">VAT Settings</label>
+        <select id="vatToggle" onchange="generateQuotation();" class="w-full bg-white border border-slate-200 text-slate-850 px-3 py-2 rounded-lg text-xs focus:outline-none focus:border-brand-700 cursor-pointer font-semibold shadow-sm">
           <option value="no">Exempted / No VAT</option>
           <option value="yes">Include 5% UAE VAT</option>
         </select>
       </div>
 
       <!-- 4) Room dimension configurations -->
-      <div class="p-4 rounded-xl border border-teal-500/10 bg-teal-950/10 space-y-3 shadow-inner">
-        <div class="text-teal-400 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5">
+      <div class="p-4 rounded-xl border border-teal-650/20 bg-teal-50/50 space-y-3 shadow-sm">
+        <div class="text-teal-700 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5">
           <span>📐 Project Master Dimensions (cm)</span>
         </div>
         <div class="grid grid-cols-3 gap-2">
           <div class="space-y-1">
-            <span class="text-[8px] text-slate-450 block text-center font-bold">WIDTH (W)</span>
-            <input type="number" id="globalWidth" placeholder="W" class="w-full bg-slate-950 border border-slate-800 rounded py-1 text-center text-xs focus:outline-none text-slate-100">
+            <span class="text-[8px] text-slate-500 block text-center font-bold">WIDTH (W)</span>
+            <input type="number" id="globalWidth" placeholder="W" class="w-full bg-white border border-slate-200 rounded py-1 text-center text-xs focus:outline-none text-slate-800 shadow-sm">
           </div>
           <div class="space-y-1">
-            <span class="text-[8px] text-slate-450 block text-center font-bold">LENGTH (L)</span>
-            <input type="number" id="globalLength" placeholder="L" class="w-full bg-slate-950 border border-slate-800 rounded py-1 text-center text-xs focus:outline-none text-slate-100">
+            <span class="text-[8px] text-slate-500 block text-center font-bold">LENGTH (L)</span>
+            <input type="number" id="globalLength" placeholder="L" class="w-full bg-white border border-slate-200 rounded py-1 text-center text-xs focus:outline-none text-slate-800 shadow-sm">
           </div>
           <div class="space-y-1">
-            <span class="text-[8px] text-slate-450 block text-center font-bold">HEIGHT (H)</span>
-            <input type="number" id="globalHeight" placeholder="H" class="w-full bg-slate-950 border border-slate-800 rounded py-1 text-center text-xs focus:outline-none text-slate-100">
+            <span class="text-[8px] text-slate-500 block text-center font-bold">HEIGHT (H)</span>
+            <input type="number" id="globalHeight" placeholder="H" class="w-full bg-white border border-slate-200 rounded py-1 text-center text-xs focus:outline-none text-slate-800 shadow-sm">
           </div>
         </div>
-        <button onclick="applySmartEstimator()" class="w-full bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs py-1.5 px-3 rounded-lg shadow-md transition duration-150 cursor-pointer">
+        <button onclick="applySmartEstimator()" class="w-full bg-teal-600 hover:bg-teal-750 text-white font-bold text-xs py-1.5 px-3 rounded-lg shadow transition duration-150 cursor-pointer">
           ⚡ Apply Smart Estimator Formulas
         </button>
       </div>
 
       <!-- 5) Dynamic Item List -->
-      <div class="border-b border-slate-800 pb-2 pt-2">
-        <h2 class="text-slate-300 text-xs font-bold uppercase tracking-widest text-brand-600">
+      <div class="border-b border-slate-200 pb-2 pt-2">
+        <h2 class="text-slate-700 text-xs font-bold uppercase tracking-widest text-brand-700">
           Quotation Line Items
         </h2>
       </div>
@@ -289,15 +285,15 @@
       <div class="items-section space-y-4" id="itemsContainer"></div>
       
       <div class="flex flex-col gap-2 pt-1 font-bold">
-        <button onclick="addItem()" class="w-full bg-slate-950 hover:bg-slate-900 border border-dashed border-slate-750 text-slate-300 hover:text-white py-2 px-3 rounded-lg text-xs font-bold transition duration-150 cursor-pointer">
+        <button onclick="addItem()" class="w-full bg-slate-50 hover:bg-slate-100 border border-dashed border-slate-300 text-slate-650 hover:text-slate-800 py-2 px-3 rounded-lg text-xs font-bold transition duration-150 cursor-pointer shadow-sm">
           + Add Custom Blank Material Row
         </button>
-        <button onclick="clearDraft()" class="w-full bg-red-600/10 border border-red-900/30 hover:bg-red-500/25 text-red-400 py-1.5 px-3 rounded-lg text-xs transition duration-150 cursor-pointer">
+        <button onclick="clearDraft()" class="w-full bg-red-50 border border-red-200 hover:bg-red-100 text-red-700 py-1.5 px-3 rounded-lg text-xs transition duration-150 cursor-pointer shadow-sm">
           🧹 Clear Draft & Re-initialize
         </button>
       </div>
 
-      <button onclick="generateQuotation(); triggerSilentCloudSave();" class="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white py-3 px-4 rounded-xl font-bold tracking-wider text-xs shadow-lg transition duration-200 cursor-pointer uppercase">
+      <button onclick="generateQuotation(); triggerSilentCloudSave();" class="w-full bg-brand-700 hover:bg-brand-600 text-white py-3 px-4 rounded-xl font-bold tracking-wider text-xs shadow-md transition duration-200 cursor-pointer uppercase">
         ⚡ Compile & Refresh Document
       </button>
 
@@ -305,31 +301,33 @@
   </div>
 
   <!-- RIGHT PREVIEW CANVAS PANEL (Visual A4 Letterhead Frame) -->
-  <div class="bg-corporate-950 overflow-y-auto flex flex-col items-center p-6 space-y-6">
+  <div class="bg-slate-100/50 xl:overflow-y-auto flex flex-col items-center p-4 sm:p-6 space-y-6">
     
     <!-- PDF and WhatsApp Quick Sync Header actions -->
-    <div class="w-full max-w-[210mm] flex flex-col sm:flex-row items-center justify-between bg-corporate-900 border border-slate-800 p-4 rounded-xl shadow-md gap-4 no-print select-none">
+    <div class="w-full max-w-[210mm] flex flex-col sm:flex-row items-center justify-between bg-white border border-slate-200 p-4 rounded-xl shadow-sm gap-4 no-print select-none">
       <div class="flex items-center gap-2">
         <span class="w-2.5 h-2.5 rounded-full bg-brand-700 animate-pulse"></span>
-        <span class="text-xs font-semibold text-slate-300 uppercase tracking-widest font-display">Client View (Revamped High-End Page)</span>
+        <span class="text-xs font-bold text-slate-700 uppercase tracking-widest font-display">Client View (Revamped High-End Page)</span>
       </div>
       <div class="flex items-center gap-3 w-full sm:w-auto">
-        <button onclick="downloadPDF()" class="flex-1 sm:flex-none flex items-center justify-center gap-1.5 bg-brand-700 hover:bg-brand-600 active:scale-[0.98] text-white font-bold text-xs py-2 px-4 rounded-lg shadow transition cursor-pointer">
+        <button onclick="downloadPDF()" class="flex-1 sm:flex-none flex items-center justify-center gap-1.5 bg-brand-700 hover:bg-brand-650 active:scale-[0.98] text-white font-bold text-xs py-2.5 px-4 rounded-lg shadow-sm transition cursor-pointer">
           📄 Download PDF Client Draft
         </button>
-        <button onclick="shareToWhatsApp()" class="flex-1 sm:flex-none flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 active:scale-[0.98] text-white font-bold text-xs py-2 px-4 rounded-lg shadow transition cursor-pointer">
+        <button onclick="shareToWhatsApp()" class="flex-1 sm:flex-none flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-705 active:scale-[0.98] text-white font-bold text-xs py-2.5 px-4 rounded-lg shadow-sm transition cursor-pointer">
           💬 Send on WhatsApp
         </button>
-        <button onclick="window.print()" class="p-2 bg-slate-800 hover:bg-slate-700 hover:text-white text-slate-400 rounded-lg shadow duration-150 cursor-pointer">
+        <button onclick="window.print()" class="p-2.5 bg-slate-50 hover:bg-slate-100 hover:text-slate-900 border border-slate-200 text-slate-600 rounded-lg shadow-sm duration-150 cursor-pointer">
           🖨️ Local Print
         </button>
       </div>
     </div>
 
     <!-- Active dynamic frame layout wrapper -->
-    <div class="quotation-container" id="quotationDoc">
-      <div class="w-[210mm] h-[297mm] bg-white rounded-lg flex items-center justify-center text-slate-400 font-medium font-display shadow-2xl">
-        Fill and customize metadata, then click "Compile Document" to generate high-fidelity layers.
+    <div class="w-full overflow-x-auto pb-4 flex justify-start lg:justify-center">
+      <div class="quotation-container shrink-0" id="quotationDoc">
+        <div class="w-[210mm] h-[297mm] bg-white rounded-lg flex items-center justify-center text-slate-400 font-medium font-display shadow-2xl border border-slate-200">
+          Fill and customize metadata, then click "Compile Document" to generate high-fidelity layers.
+        </div>
       </div>
     </div>
 
@@ -427,7 +425,7 @@ function updateFolderStatusUI(folderName) {
   const statusEl = document.getElementById('folderStatus');
   if (statusEl) {
     statusEl.innerHTML = folderName 
-      ? `Status: Saving inside <strong class="text-brand-200">${folderName}</strong>`
+      ? `Status: Saving inside <strong class="text-brand-700">${folderName}</strong>`
       : 'Status: Saving inside browser\'s default Downloads directory';
   }
 }
@@ -444,7 +442,7 @@ function initFolderSelection() {
 // --- CLOUD DATABASE HISTORY LOGS PARSERS ---
 function fetchRecentQuotes() {
   const listEl = document.getElementById('recentQuotesList');
-  listEl.innerHTML = '<div class="text-center text-slate-500 py-6">Connecting Google Database...</div>';
+  listEl.innerHTML = '<div class="text-center text-slate-400 py-6">Connecting Google Database...</div>';
   
   fetch(DB_URL)
     .then(res => {
@@ -458,9 +456,9 @@ function fetchRecentQuotes() {
     .catch(err => {
       console.error(err);
       listEl.innerHTML = `
-        <div class="text-center text-red-400 py-6 px-3">
+        <div class="text-center text-red-600 py-6 px-3 font-semibold">
           ⚠️ Connection Failure<br>
-          <span class="text-[9px] text-slate-500 block mt-1">Please ensure database is deployed correctly.</span>
+          <span class="text-[9px] text-slate-400 block mt-1">Please ensure database is deployed correctly.</span>
         </div>`;
     });
 }
@@ -468,13 +466,13 @@ function fetchRecentQuotes() {
 function renderRecentQuotes(quotes) {
   const listEl = document.getElementById('recentQuotesList');
   if (!quotes || quotes.length === 0) {
-    listEl.innerHTML = '<div class="text-center text-slate-500 py-6">No historical entries.</div>';
+    listEl.innerHTML = '<div class="text-center text-slate-400 py-6">No historical entries.</div>';
     return;
   }
   listEl.innerHTML = '';
   quotes.forEach(q => {
     const btn = document.createElement('button');
-    btn.className = "w-full text-left p-2.5 px-3 border-b border-slate-800 hover:bg-slate-800/50 flex justify-between items-center transition cursor-pointer gap-2";
+    btn.className = "w-full text-left p-2.5 px-3 border-b border-slate-100 hover:bg-slate-50 flex justify-between items-center transition cursor-pointer gap-2";
     
     let total = 0;
     if (q.itemsJson) {
@@ -487,10 +485,10 @@ function renderRecentQuotes(quotes) {
     const displayTotal = total.toLocaleString('en', {minimumFractionDigits: 2, maximumFractionDigits: 2});
     btn.innerHTML = `
       <div class="truncate grow">
-        <strong class="text-slate-200 block truncate text-[11px] font-mono font-bold">${q.ref || 'AA-UNKNOWN'}</strong>
-        <span class="text-slate-500 block truncate text-[10px] mt-0.5">${q.clientAddr || 'No Address'}</span>
+        <strong class="text-slate-800 block truncate text-[11px] font-mono font-bold">${q.ref || 'AA-UNKNOWN'}</strong>
+        <span class="text-slate-400 block truncate text-[10px] mt-0.5">${q.clientAddr || 'No Address'}</span>
       </div>
-      <span class="shrink-0 text-emerald-400 font-bold bg-emerald-500/10 text-[10.5px] rounded px-1.5 py-0.5">${displayTotal} AED</span>
+      <span class="shrink-0 text-emerald-700 font-bold bg-emerald-500/10 text-[10.5px] rounded px-1.5 py-0.5">${displayTotal} AED</span>
     `;
     btn.onclick = () => loadQuoteFromDirectory(q);
     listEl.appendChild(btn);
@@ -506,7 +504,6 @@ function filterRecentQuotes() {
   renderRecentQuotes(filtered);
 }
 
-// Loads a selected quotation configuration from database logs
 function loadQuoteFromDirectory(q) {
   document.getElementById('quotRef').value = q.ref || '';
   document.getElementById('clientAddr').value = q.clientAddr || '';
@@ -635,7 +632,7 @@ function rebuildFlatItemLibrary() {
 
 function populateCategorySelector() {
   const sel = document.getElementById('workTypeSelector');
-  sel.innerHTML = '<option value="Custom">Custom Input</option>';
+  sel.innerHTML = '<option value="Custom">Custom / Manual Input</option>';
   Object.keys(parsedLibrary).forEach(cat => {
     let opt = document.createElement('option'); opt.value = cat; opt.textContent = cat;
     sel.appendChild(opt);
@@ -714,7 +711,7 @@ function addItem(pName = '', pDesc = '', pRate = '', pFixed = false) {
   itemCount++; 
   const id = itemCount;
   const div = document.createElement('div'); 
-  div.className = 'bg-slate-950 border border-slate-800 hover:border-slate-700 p-4 rounded-xl space-y-3 relative transition'; 
+  div.className = 'bg-slate-50 border border-slate-205 hover:border-slate-300 p-4 rounded-xl space-y-3 relative transition shadow-sm'; 
   div.id = 'item_' + id;
   
   const isFixedSelected = pFixed ? 'selected' : '';
@@ -722,83 +719,83 @@ function addItem(pName = '', pDesc = '', pRate = '', pFixed = false) {
 
   div.innerHTML = `
     <div class="flex items-center justify-between">
-      <span class="text-[10px] uppercase tracking-wider font-extrabold text-brand-200">Material Item #${id}</span>
-      <button onclick="removeItem(${id})" class="text-xs text-slate-500 hover:text-red-400 font-semibold p-1 bg-slate-900 rounded border border-slate-800 transition cursor-pointer">✕ Delete</button>
+      <span class="text-[10px] uppercase tracking-wider font-extrabold text-brand-700">Material Item #${id}</span>
+      <button onclick="removeItem(${id})" class="text-[10px] text-slate-500 hover:text-red-650 font-bold p-1 px-2.5 bg-white rounded border border-slate-200 hover:bg-slate-100 transition cursor-pointer shadow-sm">✕ Delete</button>
     </div>
     
     <div class="space-y-2.5">
       <div class="space-y-1">
         <label class="text-[9px] text-slate-500 font-black uppercase tracking-wider block">Item Catalog Name</label>
-        <input type="text" id="name_${id}" list="itemNamesDatalist" value="${pName}" oninput="onItemNameInput(${id}, this.value)" class="w-full bg-slate-900 border border-slate-800 text-slate-200 px-3 py-1.5 rounded-lg text-xs focus:outline-none">
+        <input type="text" id="name_${id}" list="itemNamesDatalist" value="${pName}" oninput="onItemNameInput(${id}, this.value)" class="w-full bg-white border border-slate-200 text-slate-800 px-3 py-1.5 rounded-lg text-xs focus:outline-none focus:border-brand-700 focus:ring-1 focus:ring-brand-700 shadow-sm">
       </div>
       
       <div class="space-y-1">
         <label class="text-[9px] text-slate-500 font-black uppercase tracking-wider block">Technical Specification Details</label>
-        <textarea id="desc_${id}" rows="2" class="w-full bg-slate-900 border border-slate-800 text-slate-200 px-3 py-1.5 rounded-lg text-xs focus:outline-none resize-none">${pDesc}</textarea>
+        <textarea id="desc_${id}" rows="2" class="w-full bg-white border border-slate-200 text-slate-800 px-3 py-1.5 rounded-lg text-xs focus:outline-none focus:border-brand-700 focus:ring-1 focus:ring-brand-700 resize-none shadow-sm">${pDesc}</textarea>
       </div>
       
       <div class="flex items-center gap-1.5 py-0.5 select-none">
-        <input type="checkbox" id="toggle_size_${id}" onchange="toggleSizeDisplay(${id})" class="w-4 h-4 rounded text-brand-700 bg-slate-900 border-slate-800 focus:ring-0 cursor-pointer">
-        <label for="toggle_size_${id}" class="text-[9.5px] text-slate-300 font-bold uppercase tracking-wider cursor-pointer">Custom Area Sizing Matrix</label>
+        <input type="checkbox" id="toggle_size_${id}" onchange="toggleSizeDisplay(${id})" class="w-4 h-4 rounded text-brand-700 bg-white border-slate-200 focus:ring-0 cursor-pointer">
+        <label for="toggle_size_${id}" class="text-[9.5px] text-slate-600 font-bold uppercase tracking-wider cursor-pointer">Custom Area Sizing Matrix</label>
       </div>
       
       <!-- Responsive size array cards -->
-      <div class="bg-corporate-900 border border-slate-850 p-3 rounded-lg space-y-2" id="sizes_container_${id}" style="display:none;">
-        <span class="text-[8.5px] text-brand-200 font-bold uppercase tracking-widest block mb-1">📐 Dynamic Dimensions Setup (cm)</span>
+      <div class="bg-white border border-slate-200 p-3 rounded-lg space-y-2 shadow-sm" id="sizes_container_${id}" style="display:none;">
+        <span class="text-[8.5px] text-brand-700 font-bold uppercase tracking-widest block mb-1">📐 Dynamic Dimensions Setup (cm)</span>
         
-        <div class="grid grid-cols-[15px_1fr_15px_1fr_25px_1fr] items-center gap-2 text-[10px] text-slate-400">
-          <span class="font-bold text-slate-500 text-center">#1</span>
-          <input type="number" id="w1_${id}" placeholder="W" oninput="calcArea(${id})" class="bg-slate-950 border border-slate-800 text-center py-1 rounded text-slate-200 focus:outline-none text-[11px]">
-          <span class="text-center">×</span>
-          <input type="number" id="h1_${id}" placeholder="H" oninput="calcArea(${id})" class="bg-slate-950 border border-slate-800 text-center py-1 rounded text-slate-200 focus:outline-none text-[11px]">
-          <span class="text-center font-bold">Qty</span>
-          <input type="number" id="qty1_${id}" value="1" oninput="calcArea(${id})" class="bg-slate-950 border border-slate-800 text-center py-1 rounded text-slate-200 focus:outline-none text-[11px]">
+        <div class="grid grid-cols-[15px_1fr_15px_1fr_25px_1fr] items-center gap-2 text-[10px] text-slate-550">
+          <span class="font-bold text-slate-400 text-center">#1</span>
+          <input type="number" id="w1_${id}" placeholder="W" oninput="calcArea(${id})" class="bg-white border border-slate-200 text-center py-1 rounded text-slate-800 focus:outline-none text-[11px] shadow-sm">
+          <span class="text-center text-slate-400">×</span>
+          <input type="number" id="h1_${id}" placeholder="H" oninput="calcArea(${id})" class="bg-white border border-slate-200 text-center py-1 rounded text-slate-800 focus:outline-none text-[11px] shadow-sm">
+          <span class="text-center font-bold text-slate-500">Qty</span>
+          <input type="number" id="qty1_${id}" value="1" oninput="calcArea(${id})" class="bg-white border border-slate-200 text-center py-1 rounded text-slate-800 focus:outline-none text-[11px] shadow-sm">
         </div>
         
-        <div class="grid grid-cols-[15px_1fr_15px_1fr_25px_1fr] items-center gap-2 text-[10px] text-slate-400">
-          <span class="font-bold text-slate-500 text-center">#2</span>
-          <input type="number" id="w2_${id}" placeholder="W" oninput="calcArea(${id})" class="bg-slate-950 border border-slate-800 text-center py-1 rounded text-slate-200 focus:outline-none text-[11px]">
-          <span class="text-center">×</span>
-          <input type="number" id="h2_${id}" placeholder="H" oninput="calcArea(${id})" class="bg-slate-950 border border-slate-800 text-center py-1 rounded text-slate-200 focus:outline-none text-[11px]">
-          <span class="text-center font-bold">Qty</span>
-          <input type="number" id="qty2_${id}" oninput="calcArea(${id})" class="bg-slate-950 border border-slate-800 text-center py-1 rounded text-slate-200 focus:outline-none text-[11px]">
+        <div class="grid grid-cols-[15px_1fr_15px_1fr_25px_1fr] items-center gap-2 text-[10px] text-slate-550">
+          <span class="font-bold text-slate-400 text-center">#2</span>
+          <input type="number" id="w2_${id}" placeholder="W" oninput="calcArea(${id})" class="bg-white border border-slate-200 text-center py-1 rounded text-slate-800 focus:outline-none text-[11px] shadow-sm">
+          <span class="text-center text-slate-400">×</span>
+          <input type="number" id="h2_${id}" placeholder="H" oninput="calcArea(${id})" class="bg-white border border-slate-200 text-center py-1 rounded text-slate-800 focus:outline-none text-[11px] shadow-sm">
+          <span class="text-center font-bold text-slate-500">Qty</span>
+          <input type="number" id="qty2_${id}" oninput="calcArea(${id})" class="bg-white border border-slate-200 text-center py-1 rounded text-slate-800 focus:outline-none text-[11px] shadow-sm">
         </div>
         
-        <div class="grid grid-cols-[15px_1fr_15px_1fr_25px_1fr] items-center gap-2 text-[10px] text-slate-400">
-          <span class="font-bold text-slate-500 text-center">#3</span>
-          <input type="number" id="w3_${id}" placeholder="W" oninput="calcArea(${id})" class="bg-slate-950 border border-slate-800 text-center py-1 rounded text-slate-200 focus:outline-none text-[11px]">
-          <span class="text-center">×</span>
-          <input type="number" id="h3_${id}" placeholder="H" oninput="calcArea(${id})" class="bg-slate-950 border border-slate-800 text-center py-1 rounded text-slate-200 focus:outline-none text-[11px]">
-          <span class="text-center font-bold">Qty</span>
-          <input type="number" id="qty3_${id}" oninput="calcArea(${id})" class="bg-slate-950 border border-slate-800 text-center py-1 rounded text-slate-200 focus:outline-none text-[11px]">
+        <div class="grid grid-cols-[15px_1fr_15px_1fr_25px_1fr] items-center gap-2 text-[10px] text-slate-555 whitespace-nowrap">
+          <span class="font-bold text-slate-400 text-center">#3</span>
+          <input type="number" id="w3_${id}" placeholder="W" oninput="calcArea(${id})" class="bg-white border border-slate-200 text-center py-1 rounded text-slate-800 focus:outline-none text-[11px] shadow-sm">
+          <span class="text-center text-slate-400">×</span>
+          <input type="number" id="h3_${id}" placeholder="H" oninput="calcArea(${id})" class="bg-white border border-slate-200 text-center py-1 rounded text-slate-800 focus:outline-none text-[11px] shadow-sm">
+          <span class="text-center font-bold text-slate-505">Qty</span>
+          <input type="number" id="qty3_${id}" oninput="calcArea(${id})" class="bg-white border border-slate-200 text-center py-1 rounded text-slate-800 focus:outline-none text-[11px] shadow-sm">
         </div>
         
-        <div class="grid grid-cols-[15px_1fr_15px_1fr_25px_1fr] items-center gap-2 text-[10px] text-slate-400">
-          <span class="font-bold text-slate-500 text-center">#4</span>
-          <input type="number" id="w4_${id}" placeholder="W" oninput="calcArea(${id})" class="bg-slate-950 border border-slate-800 text-center py-1 rounded text-slate-200 focus:outline-none text-[11px]">
-          <span class="text-center">×</span>
-          <input type="number" id="h4_${id}" placeholder="H" oninput="calcArea(${id})" class="bg-slate-950 border border-slate-800 text-center py-1 rounded text-slate-200 focus:outline-none text-[11px]">
-          <span class="text-center font-bold">Qty</span>
-          <input type="number" id="qty4_${id}" oninput="calcArea(${id})" class="bg-slate-950 border border-slate-800 text-center py-1 rounded text-slate-200 focus:outline-none text-[11px]">
+        <div class="grid grid-cols-[15px_1fr_15px_1fr_25px_1fr] items-center gap-2 text-[10px] text-slate-555 whitespace-nowrap">
+          <span class="font-bold text-slate-400 text-center">#4</span>
+          <input type="number" id="w4_${id}" placeholder="W" oninput="calcArea(${id})" class="bg-white border border-slate-200 text-center py-1 rounded text-slate-800 focus:outline-none text-[11px] shadow-sm">
+          <span class="text-center text-slate-400">×</span>
+          <input type="number" id="h4_${id}" placeholder="H" oninput="calcArea(${id})" class="bg-white border border-slate-200 text-center py-1 rounded text-slate-800 focus:outline-none text-[11px] shadow-sm">
+          <span class="text-center font-bold text-slate-505">Qty</span>
+          <input type="number" id="qty4_${id}" oninput="calcArea(${id})" class="bg-white border border-slate-200 text-center py-1 rounded text-slate-800 focus:outline-none text-[11px] shadow-sm">
         </div>
       </div>
       
       <div class="grid grid-cols-2 gap-3 pt-1">
         <div class="space-y-1">
           <label class="text-[9px] text-slate-500 font-bold uppercase tracking-wider block">Price Strategy</label>
-          <select id="pType_${id}" onchange="calcArea(${id})" class="w-full bg-slate-900 border border-slate-800 text-slate-300 rounded px-2 py-1 text-xs focus:outline-none focus:border-brand-700 cursor-pointer">
+          <select id="pType_${id}" onchange="calcArea(${id})" class="w-full bg-white border border-slate-200 text-slate-700 rounded px-2 py-1 text-xs focus:outline-none focus:border-brand-700 cursor-pointer shadow-sm">
             <option value="Rate" ${isRateSelected}>Per m² (Area Rate)</option>
             <option value="Fixed" ${isFixedSelected}>Fixed General Fee</option>
           </select>
         </div>
         <div class="space-y-1">
           <label class="text-[9px] text-slate-500 font-bold uppercase tracking-wider block">Rate amount (AED)</label>
-          <input type="number" id="rate_${id}" value="${pRate}" oninput="calcArea(${id})" class="w-full bg-slate-900 border border-slate-800 text-slate-250 rounded px-3 py-1 font-bold text-xs focus:outline-none focus:border-brand-700">
+          <input type="number" id="rate_${id}" value="${pRate}" oninput="calcArea(${id})" class="w-full bg-white border border-slate-200 text-slate-800 rounded px-3 py-1 font-bold text-xs focus:outline-none focus:border-brand-700 shadow-sm">
         </div>
       </div>
     </div>
     
-    <div id="calc_${id}" data-amount="0" class="text-right pt-2 border-t border-slate-800 text-xs font-bold text-emerald-400">Pending variables...</div>`;
+    <div id="calc_${id}" data-amount="0" class="text-right pt-2 border-t border-slate-200 text-xs font-bold text-emerald-600">Pending variables...</div>`;
   document.getElementById('itemsContainer').appendChild(div);
 }
 
@@ -816,6 +813,17 @@ function toggleSizeDisplay(id) {
   const cont = document.getElementById('sizes_container_' + id);
   cont.style.display = document.getElementById('toggle_size_' + id).checked ? 'block' : 'none';
   calcArea(id);
+}
+
+// --- Clipboard Copy Helper ---
+function copyToClipboard(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    const originalText = btn.innerHTML;
+    btn.innerHTML = "✅";
+    setTimeout(() => {
+      btn.innerHTML = originalText;
+    }, 1500);
+  });
 }
 
 function removeItem(id) { 
@@ -1031,7 +1039,7 @@ function generateQuotation() {
 
   if (items.length === 0) { 
     document.getElementById('quotationDoc').innerHTML = `
-      <div class="w-[210mm] h-[297mm] bg-white rounded-lg flex items-center justify-center text-slate-400 font-medium font-display shadow-2xl">
+      <div class="w-[210mm] h-[297mm] bg-white rounded-lg flex items-center justify-center text-slate-400 font-medium font-display shadow-2xl border border-slate-200">
         Fill parameters, then click Compile Document to refresh layout blocks.
       </div>`;
     return; 
@@ -1201,7 +1209,7 @@ function generateQuotation() {
           <li style="margin-bottom:2px;"><span style="color:#c0392b;font-weight:bold;">✓</span> Commercial validity of this design offer stands for <strong>07 Business Days from date of issues.</strong></li>
         </ul>
 
-         <div style="font-size:11px;margin:20px 0 15px;line-height:1.8;font-weight:600;color:#1e293b;text-align:center;background:#f8fafc;padding:10px;border-radius:6px;border:1px solid #e2e8f0;">
+        <div style="font-size:11px;margin:20px 0 15px;line-height:1.8;font-weight:600;color:#1e293b;text-align:center;background:#f8fafc;padding:10px;border-radius:6px;border:1px solid #e2e8f0;">
           Hoping the above commercial details are satisfactory. We await your confirmed confirmation. <br>
           Kindly contact the supervisor on contact listings below for any engineering queries.
         </div>
@@ -1309,17 +1317,6 @@ function generateQuotation() {
   document.getElementById('quotationDoc').innerHTML = page1 + pageBreak + page2;
 }
 
-// --- Clipboard Copy Helper ---
-function copyToClipboard(text, btn) {
-  navigator.clipboard.writeText(text).then(() => {
-    const originalText = btn.innerHTML;
-    btn.innerHTML = "✅";
-    setTimeout(() => {
-      btn.innerHTML = originalText;
-    }, 1500);
-  });
-}
-
 // --- DYNAMIC PDF EXPORT ROUTINE ---
 function downloadPDF() {
   const ref = document.getElementById('quotRef').value || 'AA-2026-215';
@@ -1391,7 +1388,7 @@ function applySmartEstimator() {
 
 function triggerSilentCloudSave() {
   document.getElementById('syncStatusText').textContent = "SAVING...";
-  document.getElementById('syncStatusText').className = "text-yellow-400 font-bold";
+  document.getElementById('syncStatusText').className = "text-amber-600 font-bold";
   
   const data = {
     ref: document.getElementById('quotRef').value,
@@ -1411,12 +1408,12 @@ function triggerSilentCloudSave() {
   })
   .then(() => {
     document.getElementById('syncStatusText').textContent = "CONNECTED";
-    document.getElementById('syncStatusText').className = "text-emerald-400 font-bold";
+    document.getElementById('syncStatusText').className = "text-emerald-600 font-bold";
     setTimeout(fetchRecentQuotes, 1000);
   })
   .catch(e => {
     document.getElementById('syncStatusText').textContent = "SYNC ERROR";
-    document.getElementById('syncStatusText').className = "text-red-400 font-bold";
+    document.getElementById('syncStatusText').className = "text-red-650 font-bold";
     console.error(e);
   });
 }
@@ -1444,7 +1441,16 @@ window.onload = () => {
   document.getElementById('quotRef').value = "AA-" + currentYear + "-" + currentSavedRef;
   document.getElementById('quotDate').valueAsDate = new Date();
 
-  loadSpreadsheetLibrary();
+  // Load CSV Spreadsheet catalog from Cloud URL
+  fetch(SPREADSHEET_CSV_URL)
+    .then(res => res.text())
+    .then(csvText => {
+      parsedLibrary = processLibraryCSV(csvText);
+      rebuildFlatItemLibrary();
+      populateCategorySelector();
+    })
+    .catch(e => console.error("Error connecting spreadsheet catalog:", e));
+
   initFolderSelection();
   fetchRecentQuotes();
   addItem();
