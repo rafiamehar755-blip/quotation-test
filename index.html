@@ -300,6 +300,7 @@
     box-sizing: border-box; 
   }
 
+  /* Cohesive Footer Page container - Strictly forced to start on a clean next page */
   .quotation-page-footer { 
     background: white; 
     width: 210mm; 
@@ -312,6 +313,10 @@
     position: relative; 
     margin-bottom: 24px; 
     box-sizing: border-box; 
+    
+    /* Hard and Fast Rule: Prevents splitting and forces brand new page on compiled outputs */
+    page-break-before: always !important; 
+    break-before: page !important;
     page-break-inside: avoid !important; 
     break-inside: avoid !important; 
   }
@@ -1387,10 +1392,10 @@ function generateQuotation() {
           </svg>
         </div>
 
-        <!-- SIGNATURE -->
+        <!-- UPGRADED SIGNATURE (Points to Ahmad_Signature.png image) -->
         <div style="text-align:center;">
           <div style="font-size:11px;color:#64748b;margin-bottom:6px;">Signature:</div>
-          <div style="font-family:cursive;font-size:28px;color:#1e293b;border-bottom:1px solid #cbd5e1;padding:0 20px 4px;display:inline-block;">Ahmad</div>
+          <img src="Ahmad_Signature.png" alt="Ahmad Latif Signature" style="height:45px; width:auto; border-bottom:1px solid #cbd5e1; display:inline-block; padding-bottom:4px; max-width: 150px; object-fit: contain;">
         </div>
       </div>
 
@@ -1449,7 +1454,9 @@ async function downloadPDF() {
     filename:     `${ref}.pdf`,
     image:        { type: 'jpeg', quality: 0.98 },
     html2canvas:  { scale: 2, useCORS: true, logging: false },
-    jsPDF:        { unit: 'pt', format: 'a4', orientation: 'portrait' }
+    jsPDF:        { unit: 'pt', format: 'a4', orientation: 'portrait' },
+    // Enforces explicit page-break rules during PDF compiling
+    pagebreak:    { mode: ['css', 'legacy'] }
   };
 
   try {
