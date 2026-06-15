@@ -285,8 +285,8 @@
   
   .btn-print { background: #1e293b; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; }
 
-  /* Physical A4 dimensions for static symmetric layout */
-  .quotation-page { 
+  /* Physical A4 dimensions for static symmetric layout (Unified continuous wrapper) */
+  .quotation-page-sheet { 
     background: white; 
     width: 210mm; 
     min-height: 297mm; 
@@ -300,27 +300,23 @@
     box-sizing: border-box; 
   }
 
-  /* Cohesive Footer Page container */
-  .quotation-page-footer { 
-    background: white; 
-    width: 210mm; 
-    min-height: 285mm; /* Safe height spacing buffer to prevent extra trailing page */
-    height: auto; 
-    padding: 15mm 20mm; /* Trimmed top/bottom padding to prevent printing engine overflow */
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06); 
-    font-family: Arial, sans-serif; 
-    color: #1e293b; 
-    position: relative; 
-    margin-bottom: 24px; 
-    box-sizing: border-box; 
+  /* Main content area */
+  .main-content-block {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Cohesive Footer Page container - Strictly forced to start on a clean next page */
+  .cohesive-footer-block { 
+    position: relative;
+    z-index: 1;
+    margin-top: 40px;
     
-    /* Hard and Fast Rule: Forces brand new page and strictly prevents spillover blank pages */
+    /* Hard and Fast Rule: Prevents splitting and forces brand new page on compiled outputs */
     page-break-before: always !important; 
     break-before: page !important;
     page-break-inside: avoid !important; 
     break-inside: avoid !important; 
-    page-break-after: avoid !important;
-    break-after: avoid !important;
   }
 
   table { width: 100%; border-collapse: collapse; font-size: 11.5px; margin-bottom: 16px; position: relative; z-index: 1; table-layout: fixed; }
@@ -448,49 +444,33 @@
     }
     
     /* Smart Visual Zoom Scaling to perfectly fit A4 sheets inside mobile viewport */
-    .quotation-page, .quotation-page-footer { 
+    .quotation-page-sheet { 
       width: 210mm !important;
       zoom: 0.9;
-      margin-bottom: -60px !important; /* Pulls up following whitespace to prevent massive empty gaps */
       box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important; 
       border: 1px solid #cbd5e1 !important; 
     }
     .page-break-divider {
-      margin-top: -30px;
-      margin-bottom: 20px;
+      width: 100%;
+      margin: 20px 0;
     }
   }
 
   @media (max-width: 768px) {
-    .quotation-page, .quotation-page-footer { 
+    .quotation-page-sheet { 
       zoom: 0.65;
-      margin-bottom: -180px !important;
-    }
-    .page-break-divider {
-      margin-top: -120px;
-      margin-bottom: 20px;
     }
   }
   
   @media (max-width: 480px) {
-    .quotation-page, .quotation-page-footer { 
+    .quotation-page-sheet { 
       zoom: 0.46;
-      margin-bottom: -280px !important;
-    }
-    .page-break-divider {
-      margin-top: -220px;
-      margin-bottom: 20px;
     }
   }
   
   @media (max-width: 380px) {
-    .quotation-page, .quotation-page-footer { 
+    .quotation-page-sheet { 
       zoom: 0.41;
-      margin-bottom: -320px !important;
-    }
-    .page-break-divider {
-      margin-top: -260px;
-      margin-bottom: 20px;
     }
   }
 
@@ -501,7 +481,7 @@
     .container { display: block !important; width: 100% !important; }
     .preview-panel { padding: 0 !important; margin: 0 !important; background: white !important; width: 100% !important; display: block !important; }
     
-    .quotation-page, .quotation-page-footer { 
+    .quotation-page-sheet { 
       transform: scale(1) !important; 
       zoom: 1 !important;
       margin: 0 !important; 
@@ -512,9 +492,7 @@
       min-height: 297mm !important; 
       padding: 20mm !important; 
     }
-    .quotation-page-footer { min-height: 280mm !important; padding: 15mm 20mm !important; }
-    .quotation-page { page-break-after: always !important; page-break-inside: auto !important; }
-    .quotation-page-footer { page-break-inside: avoid !important; break-inside: avoid !important; page-break-after: avoid !important; }
+    .cohesive-footer-block { margin-top: 0 !important; }
   }
 </style>
 </head>
@@ -950,6 +928,7 @@ function parseCSV(text) {
   lines.push(row); return lines;
 }
 
+// --- DYNAMIC SPREADSHEET ENGINE ---
 function loadSpreadsheetLibrary() {
   fetch(SPREADSHEET_CSV_URL).then(res => res.text()).then(csvText => {
     parsedLibrary = processLibraryCSV(csvText);
@@ -1371,11 +1350,10 @@ function generateQuotation() {
       <div class="watermark-text">AHMAD ALUMINIUM &amp; GLASS</div>
     </div>`;
 
-  // Added cache-busting query parameter (?v=4) to ensure instant updates of your logo on GitHub Pages [3, 4]
   const headerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:12px;border-bottom:3px solid #991b1b;margin-bottom:10px;">
       <div style="display:flex;align-items:center;gap:15px;">
-        <img src="Ahmad_Aluminium_Logo.png?v=4" alt="Ahmad Aluminium Logo" style="height:65px; max-width:280px; object-fit:contain; border-radius:4px;">
+        <img src="Ahmad_Aluminium_Logo.png?v=5" alt="Ahmad Aluminium Logo" style="height:65px; max-width:280px; object-fit:contain; border-radius:4px;">
       </div>
       <div style="text-align:right;">
         <div style="font-size:38px;font-weight:900;color:#991b1b;letter-spacing:5px;text-transform:uppercase;">QUOTATION</div>
@@ -1387,10 +1365,12 @@ function generateQuotation() {
       <span>🌐 www.ahmadaluminium.ae</span>
     </div>`;
 
+  // Page 1: Main document wrapper (Continues naturally to page 2 if items overflow)
   const page1 = `
-  <div class="quotation-page">
+  <div class="quotation-page-sheet" id="printDocSheet">
     ${watermarkHTML}
-    <div style="position:relative;z-index:1;">
+    
+    <div class="main-content-block">
       ${headerHTML}
       <div class="client-meta-grid">
         <div>
@@ -1401,7 +1381,6 @@ function generateQuotation() {
         </div>
         <div>
           <div class="section-label">Document Info</div>
-          <!-- Ref / Quotation number highlighted in bold red -->
           <div><strong>Reference No:</strong> <span style="color: #991b1b; font-weight: bold;">${ref}</span></div>
           <div><strong>Date:</strong> ${date}</div>
           <div><strong>EMAIL:</strong> info@ahmadaluminium.ae</div>
@@ -1432,16 +1411,11 @@ function generateQuotation() {
       <div class="amount-words">Grand Total: <strong>${numberToWords(grand)}.</strong></div>
       ${generateIsometricSVG(globalW, globalL, globalH)}
     </div>
-  </div>`;
 
-  const pageBreak = `<div class="page-break-divider">Page 2 Below</div>`;
-
-  // Page 2 / 3 - All cohesive items grouped cleanly on 1 single footer page
-  const page2 = `
-  <div class="quotation-page-footer">
-    ${watermarkHTML}
-    <div style="position:relative;z-index:1;">
-      <div style="font-size:11px;color:#94a3b8;text-align:right;margin-bottom:12px;">Reference No: <span style="color: #991b1b; font-weight: bold;">${ref}</span> &nbsp;|&nbsp; Continued</div>
+    <!-- Cohesive Footer Page: Strictly forced to page break before rendering [5, 6] -->
+    <div class="cohesive-footer-block">
+      ${watermarkHTML}
+      <div style="font-size:11px;color:#94a3b8;text-align:right;margin-bottom:12px;border-bottom:1px solid #f1f5f9;padding-bottom:6px;">Reference No: <span style="color: #991b1b; font-weight: bold;">${ref}</span> &nbsp;|&nbsp; Continued</div>
 
       <div class="doc-section-title">Payment terms:</div>
       <ul class="doc-list">
@@ -1509,7 +1483,7 @@ function generateQuotation() {
         <!-- UPGRADED SIGNATURE (Points to your exact file Signature-Ahmad.png with a cache-buster parameter) [3, 4] -->
         <div style="text-align:center;">
           <div style="font-size:11px;color:#64748b;margin-bottom:6px;">Signature:</div>
-          <img src="Signature-Ahmad.png?v=4" alt="Ahmad Latif Signature" style="height:45px; width:auto; border-bottom:1px solid #cbd5e1; display:inline-block; padding-bottom:4px; max-width: 150px; object-fit: contain;">
+          <img src="Signature-Ahmad.png?v=5" alt="Ahmad Latif Signature" style="height:45px; width:auto; border-bottom:1px solid #cbd5e1; display:inline-block; padding-bottom:4px; max-width: 150px; object-fit: contain;">
         </div>
       </div>
 
@@ -1562,7 +1536,7 @@ function generateQuotation() {
     </div>
   </div>`;
 
-  document.getElementById('quotationDoc').innerHTML = page1 + pageBreak + page2;
+  document.getElementById('quotationDoc').innerHTML = page1;
 }
 
 // --- AUTOMATIC SEQUENCE PDF SAVER ---
@@ -1585,7 +1559,6 @@ async function downloadPDF() {
     image:        { type: 'jpeg', quality: 0.98 },
     html2canvas:  { scale: 2, useCORS: true, logging: false },
     jsPDF:        { unit: 'pt', format: 'a4', orientation: 'portrait' },
-    // Enforces explicit page-break rules during PDF compiling
     pagebreak:    { mode: ['css', 'legacy'] }
   };
 
