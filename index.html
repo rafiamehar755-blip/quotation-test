@@ -23,7 +23,7 @@
     -webkit-font-smoothing: antialiased; 
   }
 
-  /* Upgraded Clean Top Header */
+  /* Header Box */
   .app-header { 
     background: #ffffff; 
     padding: 14px 24px; 
@@ -368,30 +368,33 @@
     }
     .form-panel.active, .preview-panel.active { display: block !important; }
 
-    /* Responsive scaling wrapper to render A4 preview beautifully on mobile device screens */
-    .preview-panel { overflow-x: auto !important; -webkit-overflow-scrolling: touch; background: #e2e8f0 !important; }
-    .preview-toolbar { max-width: 100% !important; justify-content: center !important; gap: 8px !important; margin-bottom: 12px !important; }
+    /* Interactive, Touch-Friendly Mobile PDF Viewer (Instead of tiny unreadable scale) */
+    .preview-panel { 
+      overflow-x: auto !important; 
+      -webkit-overflow-scrolling: touch; 
+      background: #e2e8f0 !important; 
+      align-items: flex-start !important; /* Align left to support smooth horizontal swipe */
+      padding: 12px !important;
+    }
+    .preview-toolbar { 
+      max-width: 100% !important; 
+      position: sticky;
+      left: 0;
+      justify-content: center !important; 
+      gap: 8px !important; 
+      margin-bottom: 12px !important; 
+    }
     .preview-toolbar button { padding: 8px 12px !important; font-size: 12px !important; flex: 1; }
 
-    .quotation-container { width: 100% !important; display: flex; flex-direction: column; align-items: center; }
+    .quotation-container { 
+      width: max-content !important; /* Keep original page width dimensions for natural readability */
+      display: block !important;
+    }
     .quotation-page, .quotation-page-footer { 
-      transform-origin: top center; 
-      margin-bottom: 8px !important; 
-      box-shadow: none !important; 
+      margin-bottom: 12px !important; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important; 
       border: 1px solid #cbd5e1 !important; 
     }
-  }
-
-  @media (max-width: 992px) and (min-width: 769px) {
-    .quotation-page, .quotation-page-footer { transform: scale(0.9); margin-bottom: -30px !important; }
-  }
-  @media (max-width: 768px) and (min-width: 481px) {
-    .quotation-page, .quotation-page-footer { transform: scale(0.65); margin-bottom: -110px !important; }
-    .page-break-divider { margin-top: -60px; margin-bottom: 10px; }
-  }
-  @media (max-width: 480px) {
-    .quotation-page, .quotation-page-footer { transform: scale(0.44); margin-bottom: -175px !important; }
-    .page-break-divider { margin-top: -130px; margin-bottom: 10px; }
   }
 
   @media print {
@@ -420,7 +423,7 @@
 
 <datalist id="itemNamesDatalist"></datalist>
 
-<!-- Upgraded Header Box -->
+<!-- Header Box -->
 <div class="app-header">
   <div class="header-left">
     <div class="logo-box">
