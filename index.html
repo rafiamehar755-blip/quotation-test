@@ -300,13 +300,13 @@
     box-sizing: border-box; 
   }
 
-  /* Cohesive Footer Page container - Strictly forced to start on a clean next page */
+  /* Cohesive Footer Page container */
   .quotation-page-footer { 
     background: white; 
     width: 210mm; 
-    min-height: 297mm; 
+    min-height: 285mm; /* Safe height spacing buffer to prevent extra trailing page */
     height: auto; 
-    padding: 20mm; 
+    padding: 15mm 20mm; /* Trimmed top/bottom padding to prevent printing engine overflow */
     box-shadow: 0 4px 20px rgba(0,0,0,0.06); 
     font-family: Arial, sans-serif; 
     color: #1e293b; 
@@ -314,11 +314,13 @@
     margin-bottom: 24px; 
     box-sizing: border-box; 
     
-    /* Hard and Fast Rule: Prevents splitting and forces brand new page on compiled outputs */
+    /* Hard and Fast Rule: Forces brand new page and strictly prevents spillover blank pages */
     page-break-before: always !important; 
     break-before: page !important;
     page-break-inside: avoid !important; 
     break-inside: avoid !important; 
+    page-break-after: avoid !important;
+    break-after: avoid !important;
   }
 
   table { width: 100%; border-collapse: collapse; font-size: 11.5px; margin-bottom: 16px; position: relative; z-index: 1; table-layout: fixed; }
@@ -340,10 +342,47 @@
   .client-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 20px; font-size: 12px; position: relative; z-index: 1; }
   .section-label { font-size: 10px; text-transform: uppercase; color: #64748b; font-weight: bold; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; margin-bottom: 8px; letter-spacing: 0.5px; }
   
+  /* Modern High-End Bank Cards Layout */
   .bank-grid-vertical { display: flex; flex-direction: column; gap: 8px; position: relative; z-index: 1; margin-top: 10px; }
-  .bank-card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px 16px; font-size: 11px; line-height: 1.7; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; }
-  .bank-card strong { color: #991b1b; font-size: 11.5px; display: block; margin-bottom: 2px; }
-  .bank-iban { font-size: 11.5px; font-weight: bold; color: #0f172a; letter-spacing: 0.5px; }
+  .bank-card { 
+    background: #fff5f5; 
+    border: 1px solid #fee2e2; 
+    padding: 12px 16px; 
+    font-size: 11px; 
+    line-height: 1.7; 
+    border-radius: 8px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    border-left: 4px solid #991b1b; /* Crimson Brand highlight line */
+    box-shadow: 0 1px 2px rgba(0,0,0,0.01);
+  }
+  .bank-card strong { color: #991b1b; font-size: 11.5px; display: block; margin-bottom: 2px; font-weight: 700; }
+  
+  /* White Clipboard IBAN Pill Badge */
+  .iban-pill {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #1e293b;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  }
+  .iban-pill:hover {
+    border-color: #94a3b8;
+    background: #f8fafc;
+  }
+  .iban-pill svg {
+    color: #64748b;
+    flex-shrink: 0;
+  }
 
   .watermark-container { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: center; pointer-events: none; z-index: 0; overflow: hidden; }
   .watermark-text { font-family: Arial, sans-serif; font-size: 55px; font-weight: 900; color: rgba(153, 27, 27, 0.02); text-transform: uppercase; transform: rotate(-35deg); white-space: nowrap; letter-spacing: 5px; }
@@ -355,11 +394,22 @@
     .form-panel, .preview-panel { display: block !important; }
   }
 
-  /* Core Mobile Screen Media Queries */
+  /* Core Mobile Screen & Multi-device UI Scaling Rules */
   @media (max-width: 992px) {
-    .app-header { padding: 12px 16px; flex-direction: column; align-items: flex-start; gap: 12px; }
-    .header-right { width: 100%; justify-content: space-between; border-top: 1px solid #f1f5f9; padding-top: 12px; }
+    .app-header { padding: 10px 16px; flex-direction: column; align-items: flex-start; gap: 12px; }
+    .header-right { 
+      width: 100%; 
+      display: flex;
+      align-items: center;
+      justify-content: space-between; 
+      border-top: 1px solid #f1f5f9; 
+      padding-top: 10px; 
+      gap: 10px;
+    }
     .folder-setup-header { align-items: flex-start; }
+    .btn-folder-header { padding: 5px 10px; font-size: 10px; }
+    #folderStatus { font-size: 9px; }
+    .sync-badge { padding: 5px 11px; font-size: 10px; }
     
     .mobile-tabs { display: flex; }
     
@@ -373,18 +423,17 @@
     }
     .form-panel.active, .preview-panel.active { display: block !important; }
 
-    /* Interactive, Touch-Friendly Mobile PDF Viewer (Instead of tiny unreadable scale) */
+    /* Centered mobile preview area wrapper (Scroll eliminated via zoom scale) */
     .preview-panel { 
-      overflow-x: auto !important; 
-      -webkit-overflow-scrolling: touch; 
       background: #e2e8f0 !important; 
-      align-items: flex-start !important; /* Align left to support smooth horizontal swipe */
-      padding: 12px !important;
+      display: flex;
+      flex-direction: column;
+      align-items: center !important; 
+      padding: 16px 8px !important;
+      overflow-x: hidden !important; 
     }
     .preview-toolbar { 
       max-width: 100% !important; 
-      position: sticky;
-      left: 0;
       justify-content: center !important; 
       gap: 8px !important; 
       margin-bottom: 12px !important; 
@@ -392,13 +441,56 @@
     .preview-toolbar button { padding: 8px 12px !important; font-size: 12px !important; flex: 1; }
 
     .quotation-container { 
-      width: max-content !important; /* Keep original page width dimensions for natural readability */
-      display: block !important;
+      width: 100% !important; 
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
+    
+    /* Smart Visual Zoom Scaling to perfectly fit A4 sheets inside mobile viewport */
     .quotation-page, .quotation-page-footer { 
-      margin-bottom: 12px !important; 
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important; 
+      width: 210mm !important;
+      zoom: 0.9;
+      margin-bottom: -60px !important; /* Pulls up following whitespace to prevent massive empty gaps */
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important; 
       border: 1px solid #cbd5e1 !important; 
+    }
+    .page-break-divider {
+      margin-top: -30px;
+      margin-bottom: 20px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .quotation-page, .quotation-page-footer { 
+      zoom: 0.65;
+      margin-bottom: -180px !important;
+    }
+    .page-break-divider {
+      margin-top: -120px;
+      margin-bottom: 20px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .quotation-page, .quotation-page-footer { 
+      zoom: 0.46;
+      margin-bottom: -280px !important;
+    }
+    .page-break-divider {
+      margin-top: -220px;
+      margin-bottom: 20px;
+    }
+  }
+  
+  @media (max-width: 380px) {
+    .quotation-page, .quotation-page-footer { 
+      zoom: 0.41;
+      margin-bottom: -320px !important;
+    }
+    .page-break-divider {
+      margin-top: -260px;
+      margin-bottom: 20px;
     }
   }
 
@@ -411,6 +503,7 @@
     
     .quotation-page, .quotation-page-footer { 
       transform: scale(1) !important; 
+      zoom: 1 !important;
       margin: 0 !important; 
       box-shadow: none !important; 
       border: none !important; 
@@ -419,6 +512,7 @@
       min-height: 297mm !important; 
       padding: 20mm !important; 
     }
+    .quotation-page-footer { min-height: 280mm !important; padding: 15mm 20mm !important; }
     .quotation-page { page-break-after: always !important; page-break-inside: auto !important; }
     .quotation-page-footer { page-break-inside: avoid !important; break-inside: avoid !important; page-break-after: avoid !important; }
   }
@@ -666,6 +760,23 @@ function switchMobileTab(tab) {
     event.currentTarget.classList.add('active');
     generateQuotation(); 
   }
+}
+
+// --- HELPER TO COPY IBANS WITH ANIMATION ---
+function copyToClipboard(btn, ibanText) {
+  navigator.clipboard.writeText(ibanText.replace(/\s+/g, '')).then(() => {
+    const originalContent = btn.innerHTML;
+    btn.style.borderColor = '#16a34a';
+    btn.style.color = '#16a34a';
+    btn.innerHTML = `<span>Copied!</span><span style="font-size:11px;">✅</span>`;
+    setTimeout(() => {
+      btn.style.borderColor = '';
+      btn.style.color = '';
+      btn.innerHTML = originalContent;
+    }, 1500);
+  }).catch(err => {
+    console.error("Failed to copy IBAN text", err);
+  });
 }
 
 // --- CLOUD DATABASE HISTORY DIRECTORY LOADERS ---
@@ -1260,10 +1371,11 @@ function generateQuotation() {
       <div class="watermark-text">AHMAD ALUMINIUM &amp; GLASS</div>
     </div>`;
 
+  // Added cache-busting query parameter (?v=4) to ensure instant updates of your logo on GitHub Pages [3, 4]
   const headerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:12px;border-bottom:3px solid #991b1b;margin-bottom:10px;">
       <div style="display:flex;align-items:center;gap:15px;">
-        <img src="Ahmad_Aluminium_Logo.png" alt="Ahmad Aluminium Logo" style="height:65px; max-width:280px; object-fit:contain; border-radius:4px;">
+        <img src="Ahmad_Aluminium_Logo.png?v=4" alt="Ahmad Aluminium Logo" style="height:65px; max-width:280px; object-fit:contain; border-radius:4px;">
       </div>
       <div style="text-align:right;">
         <div style="font-size:38px;font-weight:900;color:#991b1b;letter-spacing:5px;text-transform:uppercase;">QUOTATION</div>
@@ -1289,7 +1401,8 @@ function generateQuotation() {
         </div>
         <div>
           <div class="section-label">Document Info</div>
-          <div><strong>Reference No:</strong> ${ref}</div>
+          <!-- Ref / Quotation number highlighted in bold red -->
+          <div><strong>Reference No:</strong> <span style="color: #991b1b; font-weight: bold;">${ref}</span></div>
           <div><strong>Date:</strong> ${date}</div>
           <div><strong>EMAIL:</strong> info@ahmadaluminium.ae</div>
         </div>
@@ -1323,11 +1436,12 @@ function generateQuotation() {
 
   const pageBreak = `<div class="page-break-divider">Page 2 Below</div>`;
 
+  // Page 2 / 3 - All cohesive items grouped cleanly on 1 single footer page
   const page2 = `
   <div class="quotation-page-footer">
     ${watermarkHTML}
     <div style="position:relative;z-index:1;">
-      <div style="font-size:11px;color:#94a3b8;text-align:right;margin-bottom:12px;">Reference No: ${ref} &nbsp;|&nbsp; Continued</div>
+      <div style="font-size:11px;color:#94a3b8;text-align:right;margin-bottom:12px;">Reference No: <span style="color: #991b1b; font-weight: bold;">${ref}</span> &nbsp;|&nbsp; Continued</div>
 
       <div class="doc-section-title">Payment terms:</div>
       <ul class="doc-list">
@@ -1392,41 +1506,57 @@ function generateQuotation() {
           </svg>
         </div>
 
-        <!-- UPGRADED SIGNATURE (Points to Ahmad_Signature.png image) -->
+        <!-- UPGRADED SIGNATURE (Points to your exact file Signature-Ahmad.png with a cache-buster parameter) [3, 4] -->
         <div style="text-align:center;">
           <div style="font-size:11px;color:#64748b;margin-bottom:6px;">Signature:</div>
-          <img src="Ahmad_Signature.png" alt="Ahmad Latif Signature" style="height:45px; width:auto; border-bottom:1px solid #cbd5e1; display:inline-block; padding-bottom:4px; max-width: 150px; object-fit: contain;">
+          <img src="Signature-Ahmad.png?v=4" alt="Ahmad Latif Signature" style="height:45px; width:auto; border-bottom:1px solid #cbd5e1; display:inline-block; padding-bottom:4px; max-width: 150px; object-fit: contain;">
         </div>
       </div>
 
-      <!-- BANK DETAILS -->
+      <!-- BANK DETAILS (MATCHING YOUR SCREENSHOT LAYOUT SPECIFICATIONS EXACTLY) -->
       <div style="border-top:2px solid #991b1b;padding-top:15px;">
-        <h3 style="color:#991b1b;font-size:14px;font-weight:bold;text-align:center;margin-bottom:12px;text-transform:uppercase;letter-spacing:2px;">Company Bank Account Details</h3>
+        <h3 style="color:#991b1b;font-size:13px;font-weight:bold;text-align:center;margin-bottom:12px;text-transform:uppercase;letter-spacing:2px;">Company Bank Account Details</h3>
         <div class="bank-grid-vertical">
+          
+          <!-- Card 1 -->
           <div class="bank-card">
             <div>
-              <strong>1) Company Account — Mashreq Bank</strong>
-              Account Title: Ahmad Aluminium and Glass Contractor LLC FZ<br>
-              <small style="color:#64748b;">Account No: 019 1021 34817 &nbsp;|&nbsp; Swift Code: BOMLAEAD</small>
+              <strong>1) Company Corporate Account — Mashreq Bank</strong>
+              <span style="font-size:11.5px;color:#1e293b;display:block;margin:2px 0;">Title: Ahmad Aluminium and Glass Contractor LLC FZ</span>
+              <small style="color:#64748b;font-size:10px;">Account No: 019 1021 34817 &nbsp;|&nbsp; Swift: BOMLAEAD</small>
             </div>
-            <div class="bank-iban">IBAN: AE36 0330 0000 1910 2134 817</div>
+            <div class="iban-pill" onclick="copyToClipboard(this, 'AE360330000019102134817')">
+              <span>AE36 0330 0000 1910 2134 817</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            </div>
           </div>
+          
+          <!-- Card 2 -->
           <div class="bank-card">
             <div>
-              <strong>2) CEO Account — Emirates NBD</strong>
-              Account Title: Ahmad Latif<br>
-              <small style="color:#64748b;">Account No: 10 1580 3625 901 &nbsp;|&nbsp; Swift Code: EBILAEAD</small>
+              <strong>2) Chief Executive Register — Emirates NBD</strong>
+              <span style="font-size:11.5px;color:#1e293b;display:block;margin:2px 0;">Title: Ahmad Latif</span>
+              <small style="color:#64748b;font-size:10px;">Account No: 10 1580 3625 901 &nbsp;|&nbsp; Swift: EBILAEAD</small>
             </div>
-            <div class="bank-iban">IBAN: AE28 0260 0010 1580 3625 901</div>
+            <div class="iban-pill" onclick="copyToClipboard(this, 'AE280260001015803625901')">
+              <span>AE28 0260 0010 1580 3625 901</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            </div>
           </div>
+          
+          <!-- Card 3 -->
           <div class="bank-card">
             <div>
-              <strong>3) Company Account — Mashreq Bank</strong>
-              Account Title: Ahmad Latif<br>
-              <small style="color:#64748b;">Account No: 019 1009 20602 &nbsp;|&nbsp; Swift Code: BOMLAEAD</small>
+              <strong>3) Secondary Operational Line — Mashreq Bank</strong>
+              <span style="font-size:11.5px;color:#1e293b;display:block;margin:2px 0;">Title: Ahmad Latif</span>
+              <small style="color:#64748b;font-size:10px;">Account No: 019 1009 20602 &nbsp;|&nbsp; Swift: BOMLAEAD</small>
             </div>
-            <div class="bank-iban">IBAN: AE72 0330 0000 1910 0920 602</div>
+            <div class="iban-pill" onclick="copyToClipboard(this, 'AE720330000019100920602')">
+              <span>AE72 0330 0000 1910 0920 602</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            </div>
           </div>
+
         </div>
       </div>
     </div>
