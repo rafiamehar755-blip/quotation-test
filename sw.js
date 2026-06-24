@@ -1,12 +1,12 @@
 const CACHE_NAME = 'ahmad-aluminium-v1';
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png',
-  '/Ahmad_Aluminium_Logo.png',
-  '/Signature-Ahmad.png'
+  './',
+  'index.html',
+  'manifest.json',
+  'icon-192.png',
+  'icon-512.png',
+  'Ahmad_Aluminium_Logo.png',
+  'Signature-Ahmad.png'
 ];
 
 self.addEventListener('install', (event) => {
