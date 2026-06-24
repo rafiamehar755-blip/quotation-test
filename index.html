@@ -1763,9 +1763,6 @@ async function downloadPDF() {
   // Automatically save to your Google Sheet dashboard first before downloading
   triggerSilentCloudSave();
 
-  // Automatically send the details to Make.com for WhatsApp automation
-  sendToMakeWebhook();
-
   // Hide page break dividers from the PDF compiler output
   const dividers = element.querySelectorAll('.page-break-divider');
   dividers.forEach(d => d.style.display = 'none');
@@ -1869,39 +1866,6 @@ function clearDraft() {
     addItemToSection(sId);
     generateQuotation();
   }
-}
-
-// --- AUTOMATIC WHATSAPP WEBHOOK SENDER ---
-function sendToMakeWebhook() {
-  // Your exact webhook link has been placed here automatically
-  const webhookUrl = "https://hook.eu1.make.com/4geyyx8rfqheki5jw64qskl36do7uqv7"; 
-  
-  // Scrape grand total text from the rendered preview page
-  const totalEl = document.querySelector('.total-row td:last-child');
-  const grandTotalText = totalEl ? totalEl.textContent.trim() : "0.00 AED";
-
-  const payload = {
-    ref: document.getElementById('quotRef').value,
-    clientAddr: document.getElementById('clientAddr').value,
-    clientPhone: document.getElementById('clientPhone').value,
-    clientEmail: document.getElementById('clientEmail').value,
-    subject: document.getElementById('subject').value,
-    date: document.getElementById('quotDate').value,
-    grandTotal: grandTotalText,
-    items: getItems()
-  };
-
-  fetch(webhookUrl, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  })
-  .then(response => {
-    console.log("Quotation data successfully synced to Make.com");
-  })
-  .catch(error => {
-    console.error("Failed to send webhook data to Make.com:", error);
-  });
 }
 
 window.onload = () => {
