@@ -638,7 +638,7 @@
 <script>
 // Aligned exactly with your Quotation Web App URL
 const DB_URL = "https://script.google.com/macros/s/AKfycbz7vTFZevifbAMfMHH7XxG7cI3Zgv_uCnLgK1DKfdhCQ3LF__JC4HIH8wvTH5BKhL59Uw/exec";
-const SPREADSHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTNizzL9Im6qMmjEcuOhH5404-GMIJDXqSuGw3xrZQARxk1sJhTIkVqT8C2AwvchDHbysmB-oftQ3Sk/pub?output=csv";
+const SPREADSHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1OympSCR6CIcQ0re9kdGRf3noTUfSw2Tgvm-oPRoHD10/gviz/tq?tqx=out:csv";
 
 // Declared globally to fix local variable scoping reference errors
 let currentYear = new Date().getFullYear();
@@ -1100,6 +1100,213 @@ function removeSection(sId) {
   }
 }
 
+function onWorkTypeChange(val) {
+  if (val === 'Custom') return;
+  document.getElementById('subject').value = "Supply & Installation of " + val;
+  
+  // Targeted rules: Formula estimator strictly clears and writes to Section 1
+  const sec1Items = document.getElementById('sec_items_1');
+  if (sec1Items) {
+    sec1Items.innerHTML = '';
+  } else {
+    addSection("Section 1");
+  }
+
+  const globalW = parseFloat(document.getElementById('globalWidth').value) || 0;
+  const globalL = parseFloat(document.getElementById('globalLength').value) || 0;
+  const globalH = parseFloat(document.getElementById('globalHeight').value) || 0;
+
+  if (!parsedLibrary || !parsedLibrary[val]) {
+    addItemToSection(1);
+    return;
+  }
+
+  parsedLibrary[val].forEach(item => {
+    // Determine Pricing Type (Fixed price items do not calculate sizes automatically)
+    const isFixed = !item.formula;
+    
+    // Create element prefilled with sheet rates strictly inside Section 1
+    addItemToSection(1, item.name, item.desc, item.rate, isFixed);
+    const currentId = itemCount;
+    
+    // Evaluate custom formulas dynamically when smart estimator is executed
+    if (hasEstimatorBeenRun && item.formula) {
+      const dims = evaluateFormula(item.formula, globalW, globalL, globalH);
+      if (dims.w > 0 && dims.h > 0) {
+        document.getElementById('toggle_size_' + currentId).checked = true;
+        toggleSizeDisplay(currentId);
+        
+        document.getElementById('w1_' + currentId).value = dims.w;
+        document.getElementById('h1_' + currentId).value = dims.h;
+        document.getElementById('qty1_' + currentId).value = dims.qty;
+      }
+    }
+    
+    calcArea(currentId);
+  });
+  
+  generateQuotation();
+}
+
+function addItemToSection(sId, pName = '', pDesc = '', pRate = '', pFixed = false) {
+  itemCount++; const id = itemCount;
+  const div = document.createElement('div'); div.className = 'item-row'; div.id = 'item_' + id;
+  
+  const isFixedSelected = pFixed ? 'selected' : '';
+  const isRateSelected = !pFixed ? 'selected' : '';
+
+  div.innerHTML = `
+    <h4>Item #${id}</h4><button class="btn-remove" onclick="removeItem(${id})">✕</button>
+    <div class="item-grid">
+      <div class="full"><label>Item Name</label><input type="text" id="name_${id}" list="itemNamesDatalist" value="${pName}" oninput="onItemNameInput(${id}, this.value)"></div>
+      <div class="full"><label>Description</label><textarea id="desc_${id}" rows="2">${pDesc}</textarea></div>
+      <div class="full" style="margin-top: 5px;"><input type="checkbox" id="toggle_size_${id}" onchange="toggleSizeDisplay(${id})"> <label style="display:inline; margin-left: 5px;">Add Custom Sizes</label></div>
+      
+      <!-- Sizes Container restored to handle up to 4 dynamic rows -->
+      <div class="full sizes-container" id="sizes_container_${id}">
+        <div class="sizes-title">📐 Custom Sizes (Up to 4 unique measurements)</div>
+        <div class="size-row">
+          <span>#1</span><input type="number" id="w1_${id}" placeholder="W (cm)" oninput="calcArea(${id})">
+          <span>×</span><input type="number" id="h1_${id}" placeholder="H (cm)" oninput="calcArea(${id})">
+          <span>Qty</span><input type="number" id="qty1_${id}" value="1" oninput="calcArea(${id})">
+        </div>
+        <div class="size-row">
+          <span>#2</span><input type="number" id="w2_${id}" placeholder="W (cm)" oninput="calcArea(${id})">
+          <span>×</span><input type="number" id="h2_${id}" placeholder="H (cm)" oninput="calcArea(${id})">
+          <span>Qty</span><input type="number" id="qty2_${id}" oninput="calcArea(${id})">
+        </div>
+        <div class="size-row">
+          <span>#3</span><input type="number" id="w3_${id}" placeholder="W (cm)" oninput="calcArea(${id})">
+          <span>×</span><input type="number" id="h3_${id}" placeholder="H (cm)" oninput="calcArea(${id})">
+          <span>Qty</span><input type="number" id="qty3_${id}" oninput="calcArea(${id})">
+        </div>
+        <div class="size-row">
+          <span>#4</span><input type="number" id="w4_${id}" placeholder="W (cm)" oninput="calcArea(${id})">
+          <span>×</span><input type="number" id="h4_${id}" placeholder="H (cm)" oninput="calcArea(${id})">
+          <span>Qty</span><input type="number" id="qty4_${id}" oninput="calcArea(${id})">
+        </div>
+      </div>
+      
+      <div style="margin-top: 5px;">
+        <label>Price Type</label>
+        <select id="pType_${id}" onchange="calcArea(${id})">
+          <option value="Rate" ${isRateSelected}>Per m²</option>
+          <option value="Fixed" ${isFixedSelected}>Fixed</option>
+        </select>
+      </div>
+      <div style="margin-top: 5px;"><label>Rate (AED)</label><input type="number" id="rate_${id}" value="${pRate}" oninput="calcArea(${id})"></div>
+    </div>
+    <div class="calc-result" id="calc_${id}" data-amount="0">Pending info...</div>`;
+  
+  document.getElementById('sec_items_' + sId).appendChild(div);
+  
+  // Trigger initial math and UI update
+  calcArea(id);
+  generateQuotation();
+}
+
+function onItemNameInput(id, val) {
+  if (flatItemLibrary[val]) {
+    document.getElementById('desc_' + id).value = flatItemLibrary[val].desc;
+    document.getElementById('rate_' + id).value = flatItemLibrary[val].rate;
+    const isFixed = !flatItemLibrary[val].formula;
+    document.getElementById('pType_' + id).value = isFixed ? 'Fixed' : 'Rate';
+    calcArea(id);
+  }
+}
+
+function toggleSizeDisplay(id) {
+  const cont = document.getElementById('sizes_container_' + id);
+  cont.style.display = document.getElementById('toggle_size_' + id).checked ? 'block' : 'none';
+  calcArea(id);
+}
+
+// calcArea dynamically sums and validates up to 4 size rows
+function calcArea(id) {
+  const rate = parseFloat(document.getElementById('rate_' + id).value) || 0;
+  const pType = document.getElementById('pType_' + id).value;
+  const sizeOn = document.getElementById('toggle_size_' + id).checked;
+  let totalArea = 0; let totalQty = 0; let sizeTxt = [];
+
+  if (sizeOn) {
+    for (let s = 1; s <= 4; s++) {
+      const w = parseFloat(document.getElementById(`w${s}_${id}`).value) || 0;
+      const h = parseFloat(document.getElementById(`h${s}_${id}`).value) || 0;
+      const q = parseFloat(document.getElementById(`qty${s}_${id}`).value) || (s === 1 ? 1 : 0);
+      
+      if (w > 0 && h > 0 && q > 0) {
+        totalArea += (w / 100) * (h / 100) * q;
+        totalQty += q;
+        sizeTxt.push(`${w}×${h}cm (${q})`);
+      }
+    }
+  }
+
+  let amount = 0;
+  let roundedArea = 0;
+  if (pType === 'Fixed') {
+    amount = rate;
+  } else {
+    if (totalArea > 0) {
+      roundedArea = Math.ceil(totalArea * 2) / 2;
+      amount = roundedArea * rate;
+    } else {
+      amount = rate;
+    }
+  }
+
+  const el = document.getElementById('calc_' + id);
+  el.dataset.amount = amount;
+  
+  // Retain legacy sizes when editing files where custom sizes are not checked
+  if (sizeOn) {
+    el.dataset.sizeText = sizeTxt.join(' | ') || '-';
+    el.dataset.roundedArea = roundedArea > 0 ? roundedArea.toFixed(1) : '';
+  } else {
+    if (!el.dataset.sizeText) {
+      el.dataset.sizeText = '-';
+    }
+  }
+  
+  el.textContent = "Amount: AED " + amount.toFixed(2);
+}
+
+function getItems() {
+  let arr = [];
+  document.querySelectorAll('.section-block').forEach(secBlock => {
+    const sId = secBlock.id.replace('section_', '');
+    const sectionTitle = document.getElementById('sec_title_' + sId).value;
+    
+    secBlock.querySelectorAll('.item-row').forEach(row => {
+      const id = row.id.replace('item_', '');
+      const calcEl = document.getElementById('calc_' + id);
+      
+      // Save full size fields so reload directory operation is highly accurate
+      let sizesArr = [];
+      for (let s = 1; s <= 4; s++) {
+        sizesArr.push({
+          w: document.getElementById(`w${s}_${id}`).value,
+          h: document.getElementById(`h${s}_${id}`).value,
+          qty: document.getElementById(`qty${s}_${id}`).value
+        });
+      }
+
+      arr.push({
+        sectionTitle: sectionTitle,
+        itemName: document.getElementById('name_' + id).value,
+        desc: document.getElementById('desc_' + id).value,
+        size: calcEl.dataset.sizeText || '-',
+        roundedArea: calcEl.dataset.roundedArea || '',
+        amount: parseFloat(calcEl.dataset.amount) || 0,
+        priceType: document.getElementById('pType_' + id).value,
+        rate: document.getElementById('rate_' + id).value,
+        sizes: sizesArr
+      });
+    });
+  });
+  return arr;
+}
+
 // --- DYNAMIC ISOMETRIC 3D DRAWING RENDERER (EXPLICIT DIMENSIONS FOR PDF EXPORTS) ---
 function generateIsometricSVG(w, l, h) {
   if (isNaN(w) || isNaN(l) || isNaN(h) || w <= 0 || l <= 0 || h <= 0) {
@@ -1124,7 +1331,7 @@ function generateIsometricSVG(w, l, h) {
 
   const r_t0 = { x: r_p0.x, y: r_p0.y + dyH };
   const r_t1 = { x: r_p1.x, y: r_p1.y + dyH };
-  const r_t2 = { x: r_p2.x, y: r_p2.y + dyH };
+  const r_t2 = { x: r_t2.x, y: r_t2.y + dyH };
   const r_t3 = { x: r_p3.x, y: r_p3.y + dyH };
 
   const allX = [r_p0.x, r_p1.x, r_p2.x, r_p3.x, r_t0.x, r_t1.x, r_t2.x, r_t3.x];
@@ -1680,6 +1887,17 @@ window.onload = () => {
   const initialSecId = addSection("Section 1");
   addItemToSection(initialSecId);
 };
+</script>
+
+<!-- Register the service worker for the Progressive Web App -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then((reg) => console.log('Service Worker Registered!', reg))
+        .catch((err) => console.log('Service Worker Registration Failed', err));
+    });
+  }
 </script>
 </body>
 </html>
