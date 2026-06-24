@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ahmad-aluminium-v3'; // Incremented version to clear old traps
+const CACHE_NAME = 'ahmad-aluminium-v4'; // Incremented version to clear old cached traps
 
 const ASSETS = [
   './',
@@ -35,9 +35,9 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch Event - Network-First for your app files, Normal fetch for Google Sheets
+// Fetch Event - Network-First for your app files, IGNORE external APIs to bypass CORS
 self.addEventListener('fetch', (event) => {
-  // Only intercept files belonging to your Github website
+  // ONLY handle requests made to your own website files
   if (event.request.url.startsWith(self.location.origin)) {
     event.respondWith(
       fetch(event.request)
@@ -55,8 +55,7 @@ self.addEventListener('fetch', (event) => {
           return caches.match(event.request);
         })
     );
-  } else {
-    // Let Google Sheets and WhatsApp bypass the cache entirely so they always fetch fresh data
-    event.respondWith(fetch(event.request));
   }
+  // DO NOT call event.respondWith() for Google Sheets, WhatsApp, or other external domains!
+  // This allows the browser to handle them natively, bypassing all service worker CORS restrictions.
 });
