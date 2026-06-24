@@ -6,6 +6,9 @@
 <title>Ahmad Aluminium & Glass - Quotation System</title>
 <!-- html2pdf.js CDN library for programmatic high-fidelity PDF exports -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<!-- Link the manifest and set the brand theme color -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#991b1b">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   
@@ -1003,28 +1006,6 @@ function loadSpreadsheetLibrary() {
   }).catch(e => console.error("Error loading spreadsheet library:", e));
 }
 
-function rebuildFlatItemLibrary() {
-  flatItemLibrary = {};
-  const datalist = document.getElementById('itemNamesDatalist');
-  datalist.innerHTML = '';
-  Object.keys(parsedLibrary).forEach(cat => {
-    parsedLibrary[cat].forEach(item => {
-      flatItemLibrary[item.name] = item;
-      let opt = document.createElement('option'); opt.value = item.name;
-      datalist.appendChild(opt);
-    });
-  });
-}
-
-function populateCategorySelector() {
-  const sel = document.getElementById('workTypeSelector');
-  sel.innerHTML = '<option value="Custom">Custom Input</option>';
-  Object.keys(parsedLibrary).forEach(cat => {
-    let opt = document.createElement('option'); opt.value = cat; opt.textContent = cat;
-    sel.appendChild(opt);
-  });
-}
-
 // --- DYNAMIC FORMULA RESOLVER ---
 function evaluateFormula(formulaStr, globalW, globalL, globalH) {
   let str = formulaStr.toLowerCase().replace(/×/g, '*').trim();
@@ -1738,7 +1719,7 @@ function generateQuotation() {
             </div>
             <div class="iban-pill" onclick="copyToClipboard(this, 'AE720330000019100920602')">
               <span>AE72 0330 0000 1910 0920 602</span>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2 2v1"></path></svg>
             </div>
           </div>
 
@@ -1890,5 +1871,18 @@ window.onload = () => {
   addItemToSection(initialSecId);
 };
 </script>
+
+<!-- Register the service worker for the Progressive Web App -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then((reg) => console.log('Service Worker Registered!', reg))
+        .catch((err) => console.log('Service Worker Registration Failed', err));
+    });
+  }
+</script>
 </body>
 </html>
+
+--- END OF FILE Paste June 24, 2026 - 1:10PM ---
