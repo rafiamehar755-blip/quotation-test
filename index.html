@@ -426,7 +426,7 @@
     flex-shrink: 0;
   }
 
-  .watermark-container { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: center; pointer-events: none; z-index: 0; overflow: hidden; }
+  .watermark-container { position: absolute; top: 0; left: 0; rght: 0; bottom: 0; display: flex; justify-content: center; align-items: center; pointer-events: none; z-index: 0; overflow: hidden; }
   .watermark-text { font-family: Arial, sans-serif; font-size: 55px; font-weight: 900; color: rgba(153, 27, 27, 0.02); text-transform: uppercase; transform: rotate(-35deg); white-space: nowrap; letter-spacing: 5px; }
 
   .recent-quote-item:hover { background: #f1f5f9 !important; }
@@ -1004,6 +1004,28 @@ function loadSpreadsheetLibrary() {
     rebuildFlatItemLibrary();
     populateCategorySelector();
   }).catch(e => console.error("Error loading spreadsheet library:", e));
+}
+
+function rebuildFlatItemLibrary() {
+  flatItemLibrary = {};
+  const datalist = document.getElementById('itemNamesDatalist');
+  datalist.innerHTML = '';
+  Object.keys(parsedLibrary).forEach(cat => {
+    parsedLibrary[cat].forEach(item => {
+      flatItemLibrary[item.name] = item;
+      let opt = document.createElement('option'); opt.value = item.name;
+      datalist.appendChild(opt);
+    });
+  });
+}
+
+function populateCategorySelector() {
+  const sel = document.getElementById('workTypeSelector');
+  sel.innerHTML = '<option value="Custom">Custom Input</option>';
+  Object.keys(parsedLibrary).forEach(cat => {
+    let opt = document.createElement('option'); opt.value = cat; opt.textContent = cat;
+    sel.appendChild(opt);
+  });
 }
 
 // --- DYNAMIC FORMULA RESOLVER ---
@@ -1719,7 +1741,7 @@ function generateQuotation() {
             </div>
             <div class="iban-pill" onclick="copyToClipboard(this, 'AE720330000019100920602')">
               <span>AE72 0330 0000 1910 0920 602</span>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2 2v1"></path></svg>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
             </div>
           </div>
 
@@ -1871,18 +1893,7 @@ window.onload = () => {
   addItemToSection(initialSecId);
 };
 </script>
-
-<!-- Register the service worker for the Progressive Web App -->
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js')
-        .then((reg) => console.log('Service Worker Registered!', reg))
-        .catch((err) => console.log('Service Worker Registration Failed', err));
-    });
-  }
-</script>
 </body>
 </html>
 
---- END OF FILE Paste June 24, 2026 - 1:10PM ---
+--- END OF FILE Paste June 24, 2026 - 2:00PM ---
