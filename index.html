@@ -604,7 +604,7 @@ function rebuildFlatItemLibrary() {
   });
 }
 
-// --- UPGRADED SHARE FUNCTION USING DIRECT WEB SHARE API LEVEL 2 ---
+// --- UPGRADED SHARE FUNCTION (WAITS FOR IMAGES BEFORE EXPORTING) ---
 async function shareToWhatsApp() {
   const ref = document.getElementById('quotRef').value || 'AA-2026-215';
   const phone = document.getElementById('clientPhone').value.replace(/\D/g,'');
@@ -616,7 +616,6 @@ async function shareToWhatsApp() {
     return;
   }
 
-  // Auto-save to Google Sheets DB before sharing
   triggerSilentCloudSave();
 
   const opt = {
@@ -629,11 +628,23 @@ async function shareToWhatsApp() {
   };
 
   try {
-    // 1. Compile document to a physical PDF Blob in the background
+    // CRITICAL CORRECTION: Force wait for images to load, ensuring Signatures and Logo never come out blank
+    const images = element.querySelectorAll('img');
+    const imageLoadPromises = Array.from(images).map(img => {
+      if (img.complete) return Promise.resolve();
+      return new Promise(resolve => {
+        img.onload = resolve;
+        img.onerror = resolve; // Continue anyway if an image is completely broken
+      });
+    });
+    
+    // Wait for all images in the document to finish loading
+    await Promise.all(imageLoadPromises);
+    
+    // Generate the PDF Blob
     const pdfBlob = await html2pdf().set(opt).from(element).output('blob');
     const file = new File([pdfBlob], `${ref}.pdf`, { type: 'application/pdf' });
 
-    // 2. Handshake with the phone's native system sharing drawer (Web Share API Level 2)
     if (
       navigator.share && 
       navigator.canShare && 
@@ -646,7 +657,6 @@ async function shareToWhatsApp() {
       });
       console.log('File shared natively successfully!');
     } else {
-      // 3. Fallback: For desktop/older browsers, download the file and launch wa.me redirect
       alert("Direct file sharing is not supported on this browser/device. Downloading PDF and launching WhatsApp instead...");
       html2pdf().set(opt).from(element).save();
       window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
@@ -771,7 +781,6 @@ function onWorkTypeChange(val) {
         if (hInput) hInput.value = dims.h;
         if (qtyInput) qtyInput.value = dims.qty;
         
-        // Critical FIX: Run calculation AFTER writing formulas to inputs to prevent race-condition
         calcArea(currentId);
       }
     } else {
@@ -1242,7 +1251,8 @@ function generateQuotation() {
     </div>
   </div>`;
 
-  const pageBreak = `<div class="page-break-divider">Page 2 Below</div>`;
+  // REMOVED THE "Page 2 Below" text and replaced with a clean divider line on the screen
+  const pageBreak = `<div class="page-break-divider" style="height: 1px; border-bottom: 1px dashed #cbd5e1; margin: 24px 0;"></div>`;
 
   const page2 = `
   <div class="quotation-page-footer">
@@ -1299,6 +1309,7 @@ function generateQuotation() {
           <img src="Signature-Ahmad.png" alt="Ahmad Latif Signature" style="height:45px; width:auto; border-bottom:1px solid #cbd5e1; display:inline-block; padding-bottom:4px; max-width: 150px; object-fit: contain;">
         </div>
       </div>
+      <!-- BANK DETAILS (MATCHING YOUR SCREENSHOT LAYOUT SPECIFICATIONS EXACTLY) -->
       <div style="border-top:2px solid #991b1b;padding-top:15px;">
         <h3 style="color:#991b1b;font-size:13px;font-weight:bold;text-align:center;margin-bottom:12px;text-transform:uppercase;letter-spacing:2px;">Company Bank Account Details</h3>
         <div class="bank-grid-vertical">
@@ -1436,6 +1447,7 @@ function triggerSilentCloudSave() {
   });
 }
 
+// UPGRADED TO WAIT FOR SIGNATURES AND LOGOS BEFORE COMPILING
 async function shareToWhatsApp() {
   const ref = document.getElementById('quotRef').value || 'AA-2026-215';
   const phone = document.getElementById('clientPhone').value.replace(/\D/g,'');
@@ -1459,6 +1471,18 @@ async function shareToWhatsApp() {
   };
 
   try {
+    // Force browser to wait until signatures and company logo are fully loaded
+    const images = element.querySelectorAll('img');
+    const imageLoadPromises = Array.from(images).map(img => {
+      if (img.complete) return Promise.resolve();
+      return new Promise(resolve => {
+        img.onload = resolve;
+        img.onerror = resolve;
+      });
+    });
+    
+    await Promise.all(imageLoadPromises);
+
     const pdfBlob = await html2pdf().set(opt).from(element).output('blob');
     const file = new File([pdfBlob], `${ref}.pdf`, { type: 'application/pdf' });
 
