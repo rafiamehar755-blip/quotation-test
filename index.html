@@ -175,7 +175,7 @@
 <div class="container">
   <div class="form-panel active" id="formPanel">
     
-    <!-- History Directory Area Area -->
+    <!-- History Directory Area -->
     <div class="recent-quotes-card">
       <label style="color: #334155; font-weight: bold; font-size: 10px; margin-bottom: 8px; display: block; letter-spacing: 1px;">🔍 Recent Quotations Directory</label>
       <input type="text" id="searchQuotes" placeholder="Type to search..." oninput="filterRecentQuotes()" style="margin-bottom: 8px; font-size: 12px; background: #ffffff; border: 1px solid #cbd5e1; color: #1e293b; padding: 8px 10px;">
@@ -258,7 +258,7 @@
 <script>
 // Aligned exactly with your Quotation Web App URL
 const DB_URL = "https://script.google.com/macros/s/AKfycbz7vTFZevifbAMfMHH7XxG7cI3Zgv_uCnLgK1DKfdhCQ3LF__JC4HIH8wvTH5BKhL59Uw/exec";
-// Bulletproof, high-fidelity CORS-proof CSV link
+// Secure, non-redirect, CORS-enabled Google Sheets export URL
 const SPREADSHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1OympSCR6CIcQ0re9kdGRf3noTUfSw2Tgvm-oPRoHD10/gviz/tq?tqx=out:csv";
 
 let currentYear = new Date().getFullYear();
@@ -602,6 +602,61 @@ function rebuildFlatItemLibrary() {
       datalist.appendChild(opt);
     });
   });
+}
+
+// --- UPGRADED SHARE FUNCTION USING DIRECT WEB SHARE API LEVEL 2 ---
+async function shareToWhatsApp() {
+  const ref = document.getElementById('quotRef').value || 'AA-2026-215';
+  const phone = document.getElementById('clientPhone').value.replace(/\D/g,'');
+  const msg = "Hello, please find your quotation Ref: " + ref;
+  
+  const element = document.getElementById('quotationDoc');
+  if (!element || element.innerHTML.includes('Fill form & Generate')) {
+    alert("Please generate the quotation first.");
+    return;
+  }
+
+  // Auto-save to Google Sheets DB before sharing
+  triggerSilentCloudSave();
+
+  const opt = {
+    margin:       0,
+    filename:     `${ref}.pdf`,
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2, useCORS: true, logging: false },
+    jsPDF:        { unit: 'pt', format: 'a4', orientation: 'portrait' },
+    pagebreak:    { mode: ['css', 'legacy'] }
+  };
+
+  try {
+    // 1. Compile document to a physical PDF Blob in the background
+    const pdfBlob = await html2pdf().set(opt).from(element).output('blob');
+    const file = new File([pdfBlob], `${ref}.pdf`, { type: 'application/pdf' });
+
+    // 2. Handshake with the phone's native system sharing drawer (Web Share API Level 2)
+    if (
+      navigator.share && 
+      navigator.canShare && 
+      navigator.canShare({ files: [file] })
+    ) {
+      await navigator.share({
+        files: [file],
+        title: ref,
+        text: msg,
+      });
+      console.log('File shared natively successfully!');
+    } else {
+      // 3. Fallback: For desktop/older browsers, download the file and launch wa.me redirect
+      alert("Direct file sharing is not supported on this browser/device. Downloading PDF and launching WhatsApp instead...");
+      html2pdf().set(opt).from(element).save();
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+  } catch (error) {
+    if (error.name !== 'AbortError') {
+      console.error('Error sharing file:', error);
+      alert(`Could not share: ${error.message || error}`);
+    }
+  }
 }
 
 function populateCategorySelector() {
@@ -1287,7 +1342,6 @@ function generateQuotation() {
   document.getElementById('quotationDoc').innerHTML = page1 + pageBreak + page2;
 }
 
-// --- AUTOMATIC SEQUENCE PDF SAVER ---
 async function downloadPDF() {
   const ref = document.getElementById('quotRef').value || 'AA-2026-215';
   const element = document.getElementById('quotationDoc');
@@ -1382,10 +1436,54 @@ function triggerSilentCloudSave() {
   });
 }
 
-function shareToWhatsApp() {
+async function shareToWhatsApp() {
+  const ref = document.getElementById('quotRef').value || 'AA-2026-215';
   const phone = document.getElementById('clientPhone').value.replace(/\D/g,'');
-  const msg = encodeURIComponent("Hello, please find your quotation Ref: " + document.getElementById('quotRef').value);
-  window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+  const msg = "Hello, please find your quotation Ref: " + ref;
+  
+  const element = document.getElementById('quotationDoc');
+  if (!element || element.innerHTML.includes('Fill form & Generate')) {
+    alert("Please generate the quotation first.");
+    return;
+  }
+
+  triggerSilentCloudSave();
+
+  const opt = {
+    margin:       0,
+    filename:     `${ref}.pdf`,
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2, useCORS: true, logging: false },
+    jsPDF:        { unit: 'pt', format: 'a4', orientation: 'portrait' },
+    pagebreak:    { mode: ['css', 'legacy'] }
+  };
+
+  try {
+    const pdfBlob = await html2pdf().set(opt).from(element).output('blob');
+    const file = new File([pdfBlob], `${ref}.pdf`, { type: 'application/pdf' });
+
+    if (
+      navigator.share && 
+      navigator.canShare && 
+      navigator.canShare({ files: [file] })
+    ) {
+      await navigator.share({
+        files: [file],
+        title: ref,
+        text: msg,
+      });
+      console.log('File shared natively successfully!');
+    } else {
+      alert("Direct file sharing is not supported on this browser/device. Downloading PDF and launching WhatsApp instead...");
+      html2pdf().set(opt).from(element).save();
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+  } catch (error) {
+    if (error.name !== 'AbortError') {
+      console.error('Error sharing file:', error);
+      alert(`Could not share: ${error.message || error}`);
+    }
+  }
 }
 
 function clearDraft() {
