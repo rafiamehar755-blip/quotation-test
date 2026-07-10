@@ -7,7 +7,7 @@
 <!-- html2pdf.js CDN library for programmatic high-fidelity PDF exports -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <!-- Link the manifest and set the brand theme color -->
-<link rel="manifest" href="manifest.json">
+<link class="manifest" rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#991b1b">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -314,6 +314,7 @@ function startNewQuotation() {
     document.getElementById('clientEmail').value = '';
     document.getElementById('subject').value = '';
     document.getElementById('discountAED').value = '0';
+    document.getElementById('vatToggle').value = 'no';
     document.getElementById('sectionsContainer').innerHTML = '';
     
     // Load the calculated next number
@@ -442,7 +443,10 @@ function fetchRecentQuotes() {
   if (!listEl) return;
   listEl.innerHTML = '<div style="text-align: center; color: #94a3b8; padding: 10px;">Loading History...</div>';
   
-  fetch(DB_URL)
+  // Append a unique timestamp to prevent the browser from serving cached stale data
+  const cacheBusterUrl = DB_URL + (DB_URL.includes('?') ? '&' : '?') + 't=' + Date.now();
+  
+  fetch(cacheBusterUrl)
   .then(res => {
     if (!res.ok) throw new Error("HTTP error " + res.status);
     return res.json();
@@ -471,8 +475,19 @@ function renderRecentQuotes(quotes) {
     listEl.innerHTML = '<div style="text-align: center; color: #64748b; padding: 10px;">No quotations found</div>';
     return;
   }
+  
+  // Helper to extract the ending numeric part of your reference (e.g. 211 from "AA-2026-211")
+  function getNumericRef(refStr) {
+    if (!refStr) return 0;
+    const match = refStr.match(/\d+$/);
+    return match ? parseInt(match[0], 10) : 0;
+  }
+
+  // Sort quotations dynamically so the highest/latest reference number is always on top
+  const sortedQuotes = [...quotes].sort((a, b) => getNumericRef(b.ref) - getNumericRef(a.ref));
+
   listEl.innerHTML = '';
-  quotes.forEach(q => {
+  sortedQuotes.forEach(q => {
     const div = document.createElement('div');
     div.style.padding = '8px';
     div.style.borderBottom = '1px solid #e2e8f0';
@@ -486,7 +501,25 @@ function renderRecentQuotes(quotes) {
     if (q.itemsJson) {
       try {
         const items = JSON.parse(q.itemsJson);
-        total = items.reduce((s, i) => s + (parseFloat(i.amount) || 0), 0);
+        let subtotal = items.reduce((s, i) => s + (parseFloat(i.amount) || 0), 0);
+        
+        // Retrieve discount & VAT from the metadata we embedded inside itemsJson
+        let discount = 0;
+        let isVat = false;
+        if (items.length > 0) {
+          const firstItem = items[0];
+          if (firstItem.discount !== undefined) {
+            discount = parseFloat(firstItem.discount) || 0;
+          }
+          if (firstItem.vat !== undefined) {
+            isVat = (firstItem.vat === 'yes');
+          }
+        }
+        
+        // Calculate dynamic grand total to display in sidebar list
+        let netTotal = Math.max(0, subtotal - discount);
+        let vat = isVat ? netTotal * 0.05 : 0;
+        total = netTotal + vat;
       } catch(e) {}
     }
     
@@ -540,6 +573,25 @@ function deserializeItems(itemsData) {
   sectionCount = 0;
   itemCount = 0;
   
+  // RESTORE DISCOUNT & VAT VALUES FROM METADATA
+  if (itemsData && itemsData.length > 0) {
+    const firstItem = itemsData[0];
+    if (firstItem.discount !== undefined) {
+      document.getElementById('discountAED').value = firstItem.discount;
+    } else {
+      document.getElementById('discountAED').value = '0';
+    }
+    
+    if (firstItem.vat !== undefined) {
+      document.getElementById('vatToggle').value = firstItem.vat;
+    } else {
+      document.getElementById('vatToggle').value = 'no';
+    }
+  } else {
+    document.getElementById('discountAED').value = '0';
+    document.getElementById('vatToggle').value = 'no';
+  }
+
   let lastSectionTitle = null;
   let currentSectionId = null;
 
@@ -644,6 +696,7 @@ function parseCSV(text) {
   lines.push(row); return lines;
 }
 
+// Loads Google Sheets Library
 function loadSpreadsheetLibrary() {
   fetch(SPREADSHEET_CSV_URL).then(res => res.text()).then(csvText => {
     parsedLibrary = processLibraryCSV(csvText);
@@ -740,11 +793,18 @@ function onWorkTypeChange(val) {
   if (val === 'Custom') return;
   document.getElementById('subject').value = "Supply & Installation of " + val;
   
-  const sec1Items = document.getElementById('sec_items_1');
-  if (sec1Items) {
-    sec1Items.innerHTML = '';
+  // Find the first section block in the workspace dynamically rather than hardcoding ID #1
+  const sections = document.querySelectorAll('.section-block');
+  let targetSectionId = null;
+  
+  if (sections.length > 0) {
+    targetSectionId = parseInt(sections[0].id.replace('section_', ''), 10);
+    const secItems = document.getElementById('sec_items_' + targetSectionId);
+    if (secItems) {
+      secItems.innerHTML = '';
+    }
   } else {
-    addSection("Section 1");
+    targetSectionId = addSection("Section 1");
   }
 
   const globalW = parseFloat(document.getElementById('globalWidth').value) || 0;
@@ -752,13 +812,13 @@ function onWorkTypeChange(val) {
   const globalH = parseFloat(document.getElementById('globalHeight').value) || 0;
 
   if (!parsedLibrary || !parsedLibrary[val]) {
-    addItemToSection(1);
+    addItemToSection(targetSectionId);
     return;
   }
 
   parsedLibrary[val].forEach(item => {
     const isFixed = !item.formula;
-    addItemToSection(1, item.name || '', item.desc || '', item.rate || 0, isFixed);
+    addItemToSection(targetSectionId, item.name || '', item.desc || '', item.rate || 0, isFixed);
     const currentId = itemCount;
     
     if (hasEstimatorBeenRun && item.formula) {
@@ -954,7 +1014,10 @@ function getItems() {
         amount: calcEl ? parseFloat(calcEl.dataset.amount) || 0 : 0,
         priceType: pTypeEl ? pTypeEl.value : 'Rate',
         rate: rateEl ? rateEl.value : '0',
-        sizes: sizesArr
+        sizes: sizesArr,
+        // Save fallback: Store discount & VAT inside items JSON to survive Google Sheets load queries
+        discount: parseFloat(document.getElementById('discountAED').value) || 0,
+        vat: document.getElementById('vatToggle').value
       });
     });
   });
@@ -1306,7 +1369,7 @@ function generateQuotation() {
           <img src="Signature-Ahmad.png" alt="Ahmad Latif Signature" style="height:45px; width:auto; border-bottom:1px solid #cbd5e1; display:inline-block; padding-bottom:4px; max-width: 150px; object-fit: contain;">
         </div>
       </div>
-      <!-- BANK DETAILS -->
+      <!-- BANK DETAILS (MATCHING YOUR SCREENSHOT LAYOUT SPECIFICATIONS EXACTLY) -->
       <div style="border-top:2px solid #991b1b;padding-top:15px;">
         <h3 style="color:#991b1b;font-size:13px;font-weight:bold;text-align:center;margin-bottom:12px;text-transform:uppercase;letter-spacing:2px;">Company Bank Account Details</h3>
         <div class="bank-grid-vertical">
@@ -1410,13 +1473,29 @@ function incrementReferenceNumber() {
 function applySmartEstimator() {
   hasEstimatorBeenRun = true;
   const cat = document.getElementById('workTypeSelector').value;
-  onWorkTypeChange(cat === 'Custom' ? 'Glass Room' : cat);
+  
+  // Dynamic fallback: If "Glass Room" category doesn't exist, use the first category in the library
+  let fallbackCat = 'Glass Room';
+  if (parsedLibrary && !parsedLibrary['Glass Room'] && Object.keys(parsedLibrary).length > 0) {
+    fallbackCat = Object.keys(parsedLibrary)[0];
+  }
+  
+  onWorkTypeChange(cat === 'Custom' ? fallbackCat : cat);
   hasEstimatorBeenRun = false; 
 }
 
 function triggerSilentCloudSave() {
   const syncEl = document.getElementById('syncStatus');
   if (syncEl) syncEl.textContent = "SAVING...";
+  
+  const itemsList = getItems();
+  const subtotal = itemsList.reduce((s, i) => s + (parseFloat(i.amount) || 0), 0);
+  const discountVal = parseFloat(document.getElementById('discountAED').value) || 0;
+  const isVat = document.getElementById('vatToggle').value === 'yes';
+  
+  const netTotal = Math.max(0, subtotal - discountVal);
+  const vat = isVat ? netTotal * 0.05 : 0;
+  const grandTotalVal = netTotal + vat;
   
   const data = {
     ref: document.getElementById('quotRef').value,
@@ -1425,7 +1504,14 @@ function triggerSilentCloudSave() {
     clientEmail: document.getElementById('clientEmail').value,
     subject: document.getElementById('subject').value,
     date: document.getElementById('quotDate').value,
-    items: getItems()
+    items: itemsList,
+    discount: discountVal,
+    vat: document.getElementById('vatToggle').value,
+    // Pass standard naming variables so your Google Sheet automatically receives the correct final grand total
+    total: grandTotalVal,
+    amount: grandTotalVal,
+    grandTotal: grandTotalVal,
+    netTotal: grandTotalVal
   };
   
   fetch(DB_URL, { 
@@ -1436,7 +1522,7 @@ function triggerSilentCloudSave() {
   })
   .then(() => {
     if (syncEl) syncEl.textContent = "CONNECTED";
-    setTimeout(fetchRecentQuotes, 1000);
+    setTimeout(fetchRecentQuotes, 2500);
   })
   .catch(e => {
     if (syncEl) syncEl.textContent = "SYNC ERROR";
@@ -1469,7 +1555,7 @@ async function shareToWhatsApp() {
 
   try {
     // Force browser to wait until signatures and company logo are fully loaded
-    const images = element.querySelectorAll('img');
+    const images = element.querySelectorAllimg ? element.querySelectorAll('img') : [];
     const imageLoadPromises = Array.from(images).map(img => {
       if (img.complete) return Promise.resolve();
       return new Promise(resolve => {
@@ -1504,6 +1590,21 @@ async function shareToWhatsApp() {
       console.error('Error sharing file:', error);
       alert(`Could not share: ${error.message || error}`);
     }
+  }
+}
+
+function clearDraft() {
+  if (confirm("Reset current draft?")) {
+    document.getElementById('clientAddr').value = '';
+    document.getElementById('clientPhone').value = '';
+    document.getElementById('clientEmail').value = '';
+    document.getElementById('subject').value = '';
+    document.getElementById('discountAED').value = '0';
+    document.getElementById('vatToggle').value = 'no';
+    document.getElementById('sectionsContainer').innerHTML = '';
+    const sId = addSection("Section 1");
+    addItemToSection(sId);
+    generateQuotation();
   }
 }
 
