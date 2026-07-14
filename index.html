@@ -187,13 +187,6 @@
 
     <h2>📋 Quotation Details</h2>
 
-    <div class="form-group">
-      <label>⚙️ Work Type Category (Section 1 Only)</label>
-      <select id="workTypeSelector" onchange="onWorkTypeChange(this.value)">
-        <option value="Custom">Custom / Manual Input</option>
-      </select>
-    </div>
-
     <div class="form-group" style="display: flex; gap: 10px;">
       <div style="flex: 1;">
         <label>Ref Number</label>
@@ -221,16 +214,6 @@
       <input type="number" id="discountAED" placeholder="e.g. 500" value="0" oninput="generateQuotation();">
     </div>
 
-    <div class="form-group" style="background: #f0fdfa; padding: 14px; border-radius: 8px; border: 1px solid #ccfbf1;">
-      <label style="color: #0f766e; font-weight: bold; font-size: 10px; letter-spacing: 1px;">📐 Room Dimensions - Section 1 Only (cm)</label>
-      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 4px;">
-        <input type="number" id="globalWidth" placeholder="W" style="border: 1px solid #99f6e4;">
-        <input type="number" id="globalLength" placeholder="L" style="border: 1px solid #99f6e4;">
-        <input type="number" id="globalHeight" placeholder="H" style="border: 1px solid #99f6e4;">
-      </div>
-      <button class="btn-glass-room" onclick="applySmartEstimator()">⚡ Apply Formulas</button>
-    </div>
-
     <h2 style="margin-top:20px; display: flex; justify-content: space-between; align-items: center;">
       <span>🔧 Multi-Section Workspace</span>
     </h2>
@@ -240,14 +223,14 @@
     
     <button onclick="addSection()" style="width: 100%; margin-top: 10px; background: #1e293b; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 13px;">📁 Add New Section</button>
 
-    <button class="btn-generate" onclick="generateQuotation(); triggerSilentCloudSave();">⚡ Generate & View Document</button>
+    <button class="btn-generate" onclick="generateQuotation();">⚡ Generate & View Document</button>
   </div>
 
   <div class="preview-panel">
     <div class="preview-toolbar">
       <button class="btn-pdf" onclick="downloadPDF()">📄 Download PDF</button>
       <button class="btn-whatsapp" onclick="shareToWhatsApp()">💬 WhatsApp</button>
-      <button class="btn-print" onclick="window.print()">🖨️ Print</button>
+      <button class="btn-print" onclick="triggerSilentCloudSave(); window.print()">🖨️ Print</button>
     </div>
     <div class="quotation-container" id="quotationDoc">
       <div style="text-align:center; color:#94a3b8; padding:80px 0; font-size:14px; font-weight: 500;">Fill form & Generate</div>
@@ -701,7 +684,11 @@ function loadSpreadsheetLibrary() {
   fetch(SPREADSHEET_CSV_URL).then(res => res.text()).then(csvText => {
     parsedLibrary = processLibraryCSV(csvText);
     rebuildFlatItemLibrary();
-    populateCategorySelector();
+    // Re-populate any sections that are already loaded in the DOM
+    document.querySelectorAll('.section-block').forEach(secBlock => {
+      const sId = parseInt(secBlock.id.replace('section_', ''), 10);
+      populateSectionCategorySelector(sId);
+    });
   }).catch(e => console.error("Error loading spreadsheet library:", e));
 }
 
@@ -719,8 +706,8 @@ function rebuildFlatItemLibrary() {
   });
 }
 
-function populateCategorySelector() {
-  const sel = document.getElementById('workTypeSelector');
+function populateSectionCategorySelector(sId) {
+  const sel = document.getElementById('sec_work_type_' + sId);
   if (!sel) return;
   sel.innerHTML = '<option value="Custom">Custom Input</option>';
   Object.keys(parsedLibrary).forEach(cat => {
@@ -760,11 +747,30 @@ function addSection(title = '') {
   const defaultTitle = title || `Section ${sId}`;
   
   div.innerHTML = `
-    <div class="section-header-row">
+    <div class="section-header-row" style="flex-wrap: wrap; gap: 8px;">
       <span style="font-size: 11px; font-weight: bold; color: #475569;">SECTION #${sId}:</span>
-      <input type="text" class="section-title-input" id="sec_title_${sId}" value="${defaultTitle}" oninput="generateQuotation()">
-      ${sId > 1 ? `<button class="btn-delete-section" onclick="removeSection(${sId})">✕ Delete Section</button>` : ''}
+      <input type="text" class="section-title-input" id="sec_title_${sId}" value="${defaultTitle}" oninput="generateQuotation()" style="min-width: 120px;">
+      ${sId > 1 ? `<button class="btn-delete-section" onclick="removeSection(${sId})">✕ Delete</button>` : ''}
     </div>
+
+    <div class="form-group" style="margin-top: 8px; margin-bottom: 8px;">
+      <label style="font-size: 9px; color: #475569;">⚙️ Work Type Category</label>
+      <select id="sec_work_type_${sId}" onchange="onSectionWorkTypeChange(${sId}, this.value)" style="padding: 6px; font-size: 12px; border-radius: 4px;">
+        <option value="Custom">Custom Input</option>
+      </select>
+    </div>
+
+    <!-- SECTION LEVEL SMART ESTIMATOR -->
+    <div class="sec-estimator-card" id="sec_estimator_${sId}" style="background: #f0fdfa; padding: 12px; border-radius: 6px; border: 1px solid #ccfbf1; margin-top: 8px; margin-bottom: 12px;">
+      <label style="color: #0f766e; font-weight: bold; font-size: 10px; letter-spacing: 0.5px; display: block; margin-bottom: 6px; text-transform: uppercase;">📐 Room Dimensions - Section ${sId} Only (cm)</label>
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
+        <input type="number" id="sec_w_${sId}" placeholder="Width" style="font-size: 11px; padding: 6px; border: 1px solid #99f6e4; border-radius: 4px; width: 100%; min-width: 0;" oninput="generateQuotation()">
+        <input type="number" id="sec_l_${sId}" placeholder="Length" style="font-size: 11px; padding: 6px; border: 1px solid #99f6e4; border-radius: 4px; width: 100%; min-width: 0;" oninput="generateQuotation()">
+        <input type="number" id="sec_h_${sId}" placeholder="Height" style="font-size: 11px; padding: 6px; border: 1px solid #99f6e4; border-radius: 4px; width: 100%; min-width: 0;" oninput="generateQuotation()">
+      </div>
+      <button class="btn-glass-room" style="padding: 6px; font-size: 11px; margin-top: 8px;" onclick="applySectionSmartEstimator(${sId})">⚡ Apply Section Formulas</button>
+    </div>
+
     <div class="section-items" id="sec_items_${sId}"></div>
     <button class="btn-add" style="border: 1px dashed #991b1b; color: #991b1b;" onclick="addItemToSection(${sId})">+ Add Item to ${defaultTitle}</button>
   `;
@@ -777,6 +783,8 @@ function addSection(title = '') {
   titleInput.addEventListener('input', () => {
     addBtn.textContent = `+ Add Item to ${titleInput.value || 'this Section'}`;
   });
+
+  populateSectionCategorySelector(sId);
   
   return sId;
 }
@@ -789,40 +797,35 @@ function removeSection(sId) {
   }
 }
 
-function onWorkTypeChange(val) {
+function onSectionWorkTypeChange(sId, val) {
   if (val === 'Custom') return;
-  document.getElementById('subject').value = "Supply & Installation of " + val;
+
+  // Sync subject field with section 1's work type category selectively
+  if (sId === 1) {
+    document.getElementById('subject').value = "Supply & Installation of " + val;
+  }
   
-  // Find the first section block in the workspace dynamically rather than hardcoding ID #1
-  const sections = document.querySelectorAll('.section-block');
-  let targetSectionId = null;
-  
-  if (sections.length > 0) {
-    targetSectionId = parseInt(sections[0].id.replace('section_', ''), 10);
-    const secItems = document.getElementById('sec_items_' + targetSectionId);
-    if (secItems) {
-      secItems.innerHTML = '';
-    }
-  } else {
-    targetSectionId = addSection("Section 1");
+  const secItems = document.getElementById('sec_items_' + sId);
+  if (secItems) {
+    secItems.innerHTML = '';
   }
 
-  const globalW = parseFloat(document.getElementById('globalWidth').value) || 0;
-  const globalL = parseFloat(document.getElementById('globalLength').value) || 0;
-  const globalH = parseFloat(document.getElementById('globalHeight').value) || 0;
+  const w = parseFloat(document.getElementById('sec_w_' + sId).value) || 0;
+  const l = parseFloat(document.getElementById('sec_l_' + sId).value) || 0;
+  const h = parseFloat(document.getElementById('sec_h_' + sId).value) || 0;
 
   if (!parsedLibrary || !parsedLibrary[val]) {
-    addItemToSection(targetSectionId);
+    addItemToSection(sId);
     return;
   }
 
   parsedLibrary[val].forEach(item => {
     const isFixed = !item.formula;
-    addItemToSection(targetSectionId, item.name || '', item.desc || '', item.rate || 0, isFixed);
+    addItemToSection(sId, item.name || '', item.desc || '', item.rate || 0, isFixed);
     const currentId = itemCount;
     
-    if (hasEstimatorBeenRun && item.formula) {
-      const dims = evaluateFormula(item.formula, globalW, globalL, globalH);
+    if (item.formula && w > 0 && l > 0 && h > 0) {
+      const dims = evaluateFormula(item.formula, w, l, h);
       if (dims.w > 0 && dims.h > 0) {
         const toggleSizeEl = document.getElementById('toggle_size_' + currentId);
         if (toggleSizeEl) {
@@ -847,6 +850,20 @@ function onWorkTypeChange(val) {
   generateQuotation();
 }
 
+function applySectionSmartEstimator(sId) {
+  const cat = document.getElementById('sec_work_type_' + sId).value;
+  if (cat === 'Custom') {
+    let fallbackCat = 'Glass Room';
+    if (parsedLibrary && !parsedLibrary['Glass Room'] && Object.keys(parsedLibrary).length > 0) {
+      fallbackCat = Object.keys(parsedLibrary)[0];
+    }
+    document.getElementById('sec_work_type_' + sId).value = fallbackCat;
+    onSectionWorkTypeChange(sId, fallbackCat);
+  } else {
+    onSectionWorkTypeChange(sId, cat);
+  }
+}
+
 function addItemToSection(sId, pName = '', pDesc = '', pRate = '', pFixed = false) {
   itemCount++; const id = itemCount;
   const div = document.createElement('div'); div.className = 'item-row'; div.id = 'item_' + id;
@@ -861,7 +878,7 @@ function addItemToSection(sId, pName = '', pDesc = '', pRate = '', pFixed = fals
       <div class="full"><label>Description</label><textarea id="desc_${id}" rows="2">${pDesc}</textarea></div>
       <div class="full" style="margin-top: 5px;"><input type="checkbox" id="toggle_size_${id}" onchange="toggleSizeDisplay(${id})"> <label style="display:inline; margin-left: 5px;">Add Custom Sizes</label></div>
       
-      <div class="full sizes-container" id="sizes_container_${id}">
+      <div class="full sizes-container" id="sizes_container_${id}" style="display: none;">
         <div class="sizes-title">📐 Custom Sizes (Up to 4 unique measurements)</div>
         <div class="size-row">
           <span>#1</span><input type="number" id="w1_${id}" placeholder="W (cm)" oninput="calcArea(${id})">
@@ -1015,7 +1032,6 @@ function getItems() {
         priceType: pTypeEl ? pTypeEl.value : 'Rate',
         rate: rateEl ? rateEl.value : '0',
         sizes: sizesArr,
-        // Save fallback: Store discount & VAT inside items JSON to survive Google Sheets load queries
         discount: parseFloat(document.getElementById('discountAED').value) || 0,
         vat: document.getElementById('vatToggle').value
       });
@@ -1140,9 +1156,11 @@ function generateQuotation() {
   
   const discountVal = parseFloat(document.getElementById('discountAED').value) || 0;
   const isVat = document.getElementById('vatToggle').value === 'yes';
-  const globalW = parseFloat(document.getElementById('globalWidth').value) || 0;
-  const globalL = parseFloat(document.getElementById('globalLength').value) || 0;
-  const globalH = parseFloat(document.getElementById('globalHeight').value) || 0;
+
+  // Read section 1 estimator sizes specifically for rendering the diagram dynamically
+  const s1W = document.getElementById('sec_w_1') ? parseFloat(document.getElementById('sec_w_1').value) || 0 : 0;
+  const s1L = document.getElementById('sec_l_1') ? parseFloat(document.getElementById('sec_l_1').value) || 0 : 0;
+  const s1H = document.getElementById('sec_h_1') ? parseFloat(document.getElementById('sec_h_1').value) || 0 : 0;
 
   let rows = '';
   let globalSr = 1;
@@ -1307,11 +1325,10 @@ function generateQuotation() {
         </tbody>
       </table>
       <div class="amount-words">Grand Total: <strong>${numberToWords(grand)}.</strong></div>
-      ${generateIsometricSVG(globalW, globalL, globalH)}
+      ${generateIsometricSVG(s1W, s1L, s1H)}
     </div>
   </div>`;
 
-  // REMOVED THE "Page 2 Below" text and replaced with a clean divider line on the screen
   const pageBreak = `<div class="page-break-divider" style="height: 1px; border-bottom: 1px dashed #cbd5e1; margin: 24px 0;"></div>`;
 
   const page2 = `
@@ -1470,20 +1487,6 @@ function incrementReferenceNumber() {
   }
 }
 
-function applySmartEstimator() {
-  hasEstimatorBeenRun = true;
-  const cat = document.getElementById('workTypeSelector').value;
-  
-  // Dynamic fallback: If "Glass Room" category doesn't exist, use the first category in the library
-  let fallbackCat = 'Glass Room';
-  if (parsedLibrary && !parsedLibrary['Glass Room'] && Object.keys(parsedLibrary).length > 0) {
-    fallbackCat = Object.keys(parsedLibrary)[0];
-  }
-  
-  onWorkTypeChange(cat === 'Custom' ? fallbackCat : cat);
-  hasEstimatorBeenRun = false; 
-}
-
 function triggerSilentCloudSave() {
   const syncEl = document.getElementById('syncStatus');
   if (syncEl) syncEl.textContent = "SAVING...";
@@ -1507,7 +1510,6 @@ function triggerSilentCloudSave() {
     items: itemsList,
     discount: discountVal,
     vat: document.getElementById('vatToggle').value,
-    // Pass standard naming variables so your Google Sheet automatically receives the correct final grand total
     total: grandTotalVal,
     amount: grandTotalVal,
     grandTotal: grandTotalVal,
@@ -1530,7 +1532,6 @@ function triggerSilentCloudSave() {
   });
 }
 
-// UPGRADED TO WAIT FOR SIGNATURES AND LOGOS BEFORE COMPILING
 async function shareToWhatsApp() {
   const ref = document.getElementById('quotRef').value || 'AA-2026-215';
   const phone = document.getElementById('clientPhone').value.replace(/\D/g,'');
@@ -1554,8 +1555,7 @@ async function shareToWhatsApp() {
   };
 
   try {
-    // Force browser to wait until signatures and company logo are fully loaded
-    const images = element.querySelectorAllimg ? element.querySelectorAll('img') : [];
+    const images = element.querySelectorAll ? element.querySelectorAll('img') : [];
     const imageLoadPromises = Array.from(images).map(img => {
       if (img.complete) return Promise.resolve();
       return new Promise(resolve => {
