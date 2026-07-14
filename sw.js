@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ahmad-aluminium-v4'; // Incremented version to clear old cached traps
+const CACHE_NAME = 'ahmad-aluminium-v5'; // Incremented version to apply architectural adjustments
 
 const ASSETS = [
   './',
@@ -56,6 +56,4 @@ self.addEventListener('fetch', (event) => {
         })
     );
   }
-  // DO NOT call event.respondWith() for Google Sheets, WhatsApp, or other external domains!
-  // This allows the browser to handle them natively, bypassing all service worker CORS restrictions.
 });
